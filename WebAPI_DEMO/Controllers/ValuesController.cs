@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI_DEMO.Model;
+using WebAPI_DEMO.Model.Table;
 
 namespace WebAPI_DEMO.Controllers
 {
@@ -12,11 +14,21 @@ namespace WebAPI_DEMO.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+
+
+        public IAccountService _studentService;
+
+        public ValuesController(IAccountService studentService)
         {
-            return new string[] { "value1", "value2" };
+            this._studentService = studentService;
+        }
+
+
+        // GET api/values
+        [HttpPost("GetAccountData")]
+        public List<AccountData> Get()
+        {
+            return this._studentService.GetAccountData();
         }
 
         // GET api/values/5

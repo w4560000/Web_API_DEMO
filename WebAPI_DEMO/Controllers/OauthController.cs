@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using WebAPI_DEMO.ViewModel;
+using WebAPI_DEMO.Model.Table;
 
 namespace WebAPI_DEMO.Controllers
 {
@@ -32,16 +32,16 @@ namespace WebAPI_DEMO.Controllers
 
 
         [HttpPost("authenticate")]
-        public IActionResult RequestToken([FromBody]User_viewmodel request)
+        public IActionResult RequestToken([FromBody]AccountData request)
         {
             if (request != null)
             {
                 //驗證帳號密碼，等DB建好在判斷帳密
-                if ("test1".Equals(request.UserName) && "334567".Equals(request.Password))
+                if ("test1".Equals(request.Account) && "334567".Equals(request.PassWord))
                 {
                     var claims = new[] {
                         //加入用户的名稱
-                        new Claim(ClaimTypes.Name,request.UserName),
+                        new Claim(ClaimTypes.Name,request.Account),
                         new Claim("CompletedBasicTraining", ""),
                         //new Claim(CustomClaimTypes.EmploymentCommenced,"EmploymentCommenced", ClaimValueTypes.String)
                          new Claim(CustomClaimTypes.testCommenced,
@@ -57,7 +57,7 @@ namespace WebAPI_DEMO.Controllers
 
                     var token = new JwtSecurityToken(
                         issuer: "admin",
-                        audience: request.UserName,
+                        audience: request.Account,
                         claims: claims,
                         expires: expiresAt,
                         signingCredentials: creds);
@@ -68,7 +68,7 @@ namespace WebAPI_DEMO.Controllers
                         token_type = "Bearer",
                         profile = new
                         {
-                            name = request.UserName,
+                            Account = request.Account,
                             auth_time = new DateTimeOffset(authTime).ToUnixTimeSeconds(),
                             expires_at = new DateTimeOffset(expiresAt).ToUnixTimeSeconds()
                         }

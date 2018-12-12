@@ -9,11 +9,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using WebAPI_DEMO.Model;
+using WebAPI_DEMO.Model.Table;
 using WebAPI_DEMO.Security;
 using static WebAPI_DEMO.Security.Auth_Middle;
 
@@ -32,6 +35,10 @@ namespace WebAPI_DEMO
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("FOR_VUEContext")));
+
+            services.AddScoped<IAccountService, AccountService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
