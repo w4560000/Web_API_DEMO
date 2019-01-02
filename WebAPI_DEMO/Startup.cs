@@ -38,6 +38,18 @@ namespace WebAPI_DEMO
 
             services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("FOR_VUEContext")));
 
+            services.AddCors(options =>
+            {
+                // CorsPolicy 是自訂的 Policy 名稱
+                options.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.WithOrigins("http://localhost:8080")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
             services.AddScoped<IAccountService, AccountService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -77,6 +89,7 @@ namespace WebAPI_DEMO
             {
                 app.UseHsts();
             }
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
