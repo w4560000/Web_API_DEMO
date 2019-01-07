@@ -43,7 +43,7 @@ namespace WebAPI_DEMO
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("http://localhost:8080")
+                    policy.WithOrigins("http://localhost:8081")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();

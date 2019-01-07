@@ -15,5 +15,10 @@ namespace WebAPI_DEMO.Model
         bool CheckAccountCanUse(string Account);
 
         bool CheckEmailCanUse(string Email);
+
+        void SendMail(string Email);
+
+        int[] CreateValidationCode();
+
     }
 }

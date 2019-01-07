@@ -34,6 +34,7 @@ namespace WebAPI_DEMO.Controllers
                 if (this._AccountService.CheckEmailCanUse(AccountData.Email))
                 {
                     this._AccountService.SignupAccount(AccountData);
+                    this._AccountService.SendMail(AccountData.Email);
                 }
                 else
                 {
