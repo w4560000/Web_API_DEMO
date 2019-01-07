@@ -24,5 +24,45 @@ namespace WebAPI_DEMO.Model
             var result = this._dbContext.AccountData.ToList();
             return result;
         }
+
+        public void SignupAccount(AccountData AccountData)
+        {
+            var NEWAccountData = new AccountData()
+            {
+                Account = AccountData.Account,
+                PassWord = AccountData.PassWord,
+                Email = AccountData.Email,
+                SignupDate = DateTime.Now
+            };
+
+            this._dbContext.AccountData.Add(NEWAccountData);
+            this._dbContext.SaveChanges();
+        }
+        //註冊帳號時，先檢查帳號是否重複
+        public bool CheckAccountCanUse(string Account)
+        {
+            if (Account != null || Account != "")
+            {
+                var result = this._dbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
+
+                if (result == null)
+                    return true;
+            }
+
+            return false;
+        }
+        //註冊帳號時，先檢查mail是否重複
+        public bool CheckEmailCanUse(string Email)
+        {
+            if (Email != null || Email != "")
+            {
+                var result = this._dbContext.AccountData.Where(r => r.Email == Email).FirstOrDefault();
+
+                if (result == null)
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

@@ -9,5 +9,11 @@ namespace WebAPI_DEMO.Model
     public interface IAccountService
     {
         List<AccountData> GetAccountData();
+
+        void SignupAccount(AccountData AccountData);
+
+        bool CheckAccountCanUse(string Account);
+
+        bool CheckEmailCanUse(string Email);
     }
 }

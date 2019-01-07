@@ -17,7 +17,7 @@ namespace WebAPI_DEMO.Model.Table
 
         public virtual DbSet<AccountData> AccountData { get; set; }
 
-     
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,17 +26,37 @@ namespace WebAPI_DEMO.Model.Table
                 entity.HasKey(e => e.Account);
 
                 entity.Property(e => e.Account)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(30)
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Data)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(30);
 
                 entity.Property(e => e.PassWord)
                     .IsRequired()
-                    .HasMaxLength(10)
+                    .HasMaxLength(30);
+
+                entity.Property(e => e.SendmailDate)
+                    .HasColumnName("sendmail_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.SigninDate)
+                    .HasColumnName("signin_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.SignupDate)
+                    .HasColumnName("signup_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.SignupFinish)
+                    .HasColumnName("signup_finish")
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.VerificationCode)
+                    .HasColumnName("verification_code")
+                    .HasMaxLength(4)
                     .IsUnicode(false);
             });
         }
