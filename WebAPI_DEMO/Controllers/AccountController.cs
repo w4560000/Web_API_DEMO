@@ -60,9 +60,9 @@ namespace WebAPI_DEMO.Controllers
         }
 
         [HttpPost("SignupFinish")]
-        public string SignupFinish(string Account,string Email)
+        public string SignupFinish(AccountData AccountData)
         {
-            return this._AccountService.SignupFinish(Account, Email);
+            return this._AccountService.SignupFinish(AccountData.Account, AccountData.VerificationCode);
         }
     }
 }

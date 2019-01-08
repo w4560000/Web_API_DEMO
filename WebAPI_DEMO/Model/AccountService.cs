@@ -135,14 +135,14 @@ namespace WebAPI_DEMO.Model
             return randomArray;
         }
         //完成註冊，檢查user輸入的驗證碼是否正確
-        public string SignupFinish(string Account,string ValidationCode)
+        public string SignupFinish(string Account,string VerificationCode)
         {
             var item = this._dbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
 
-            if (item.VerificationCode == ValidationCode)
+            if (item.VerificationCode == VerificationCode)
                 return "驗證成功！";
             else
-                return "驗證失敗！　請確認驗證碼是否輸入正確！";
+                return "驗證失敗！請確認驗證碼是否輸入正確！";
         }
     }
 }
