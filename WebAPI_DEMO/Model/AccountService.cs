@@ -43,7 +43,7 @@ namespace WebAPI_DEMO.Model
         //註冊帳號時，先檢查帳號是否重複
         public bool CheckAccountCanUse(string Account)
         {
-            if (Account != null || Account != "")
+            if (Account != null)
             {
                 var result = this._dbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
 
@@ -56,7 +56,7 @@ namespace WebAPI_DEMO.Model
         //註冊帳號時，先檢查mail是否重複
         public bool CheckEmailCanUse(string Email)
         {
-            if (Email != null || Email != "")
+            if (Email != null)
             {
                 var result = this._dbContext.AccountData.Where(r => r.Email == Email).FirstOrDefault();
 
@@ -67,6 +67,7 @@ namespace WebAPI_DEMO.Model
             return false;
         }
 
+        //寄送驗證碼
         public void SendMail(string Email)
         {
              int[] ValidationCodeArray= CreateValidationCode();//產生4位驗證碼
@@ -79,11 +80,11 @@ namespace WebAPI_DEMO.Model
             
 
             var bodyBuilder = new BodyBuilder();
-            string body="<p>安安你好!恭喜中毒囉~</p><br/><b>It's joking! Don't worry~!</b>";
+            string body= "<span style=\"color:black;\">安安你好!恭喜中毒囉~</span> <br/><br/> <span style=\"color:black;\">It's joking! Don't worry~!</span><br/><br/><br/><br/>";
 
-            body += "<br/><br/><br/><br/> <span>Hello,This is 鄭秉庠 .Net Core Mail Test!</span>";
+            body += "<span style=\"font-size:20px;color:black;\">Hello</span><br/><span style=\"font-size:20px;color:black;\">This is 鄭秉庠's .Net Core Mail Test!</span><br/>";
 
-            body += "<span>Your Validation Code is : <span style=\"font-size:16px;color:red;\">";
+            body += "<span style=\"font-size:20px;color:black;\">Your Validation Code is : <span style=\"font-size:30px;color:red;\">";
 
             for(int i=0;i<4;i++)
             {
@@ -112,7 +113,7 @@ namespace WebAPI_DEMO.Model
 
             this._dbContext.SaveChanges();
         }
-
+        //產生四位驗證碼
         public int[] CreateValidationCode()
         {
             int[] randomArray = new int[4];
@@ -132,6 +133,16 @@ namespace WebAPI_DEMO.Model
             }
 
             return randomArray;
+        }
+        //完成註冊，檢查user輸入的驗證碼是否正確
+        public string SignupFinish(string Account,string ValidationCode)
+        {
+            var item = this._dbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
+
+            if (item.VerificationCode == ValidationCode)
+                return "驗證成功！";
+            else
+                return "驗證失敗！　請確認驗證碼是否輸入正確！";
         }
     }
 }

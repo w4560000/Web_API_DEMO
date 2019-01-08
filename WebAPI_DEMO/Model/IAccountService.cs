@@ -10,13 +10,15 @@ namespace WebAPI_DEMO.Model
     {
         List<AccountData> GetAccountData();
 
-        void SignupAccount(AccountData AccountData);
-
         bool CheckAccountCanUse(string Account);
 
         bool CheckEmailCanUse(string Email);
 
+        void SignupAccount(AccountData AccountData);
+
         void SendMail(string Email);
+
+        string  SignupFinish(string Account, string ValidationCode);
 
         int[] CreateValidationCode();
 

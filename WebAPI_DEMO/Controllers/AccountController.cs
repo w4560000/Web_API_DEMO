@@ -58,5 +58,11 @@ namespace WebAPI_DEMO.Controllers
             else
                 return ErrorMessage;
         }
+
+        [HttpPost("SignupFinish")]
+        public string SignupFinish(string Account,string Email)
+        {
+            return this._AccountService.SignupFinish(Account, Email);
+        }
     }
 }
