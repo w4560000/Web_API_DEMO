@@ -38,8 +38,9 @@ namespace WebAPI_DEMO.Security
                         IDatabase db = redis.GetDatabase(0);
                         db.StringSet("test1", context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced).Value);
 
-                        db.HashSet("LoginTimeOut", new HashEntry[] { new HashEntry(context.User.FindFirst(claim => claim.Type == "aud").Value, context.User.FindFirst(claim => claim.Type == "exp").Value) });
+                        db.HashSet("LoginAccount", new HashEntry[] { new HashEntry(context.User.FindFirst(claim => claim.Type == "aud").Value + "_Login_Date", context.User.FindFirst(claim => claim.Type == "exp").Value) });
 
+                        redis.Dispose();
 
                         context.Succeed(requirement);
                     }

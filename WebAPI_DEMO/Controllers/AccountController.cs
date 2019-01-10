@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using WebAPI_DEMO.Model;
 using WebAPI_DEMO.Model.Table;
 
@@ -14,8 +15,6 @@ namespace WebAPI_DEMO.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-
-
         public IAccountService _AccountService;
 
         public AccountController(IAccountService AccountService)
@@ -23,8 +22,11 @@ namespace WebAPI_DEMO.Controllers
             this._AccountService = AccountService;
         }
 
-
-        // GET api/values
+        /// <summary>
+        /// 註冊帳號並寄送驗證碼
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
         [HttpPost("SignupAccount")]
         public string SignupAccount(AccountData AccountData)
         {
@@ -59,10 +61,53 @@ namespace WebAPI_DEMO.Controllers
                 return ErrorMessage;
         }
 
-        [HttpPost("SignupFinish")]
-        public string SignupFinish(AccountData AccountData)
+        /// <summary>
+        /// 確認驗證碼是否正確
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
+        [HttpPost("CheckVerificationCode")]
+        public string CheckVerificationCode(AccountData AccountData)
         {
-            return this._AccountService.SignupFinish(AccountData.Account, AccountData.VerificationCode);
+            return this._AccountService.CheckVerificationCode(AccountData.Account, AccountData.VerificationCode);
         }
+
+        /// <summary>
+        /// 登入驗證帳號密碼
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("SigninValidation")]
+         public IActionResult SigninValidation([FromBody]AccountData request)
+         {
+            if (request != null)
+            {
+                if (this._AccountService.SigninValidation(request.Account, request.PassWord))
+                {
+                    return Ok(new {
+                        Message = "登入成功！",
+                        JWT = this._AccountService.ResponseJWT(request.Account, false) });
+                }
+            }
+                return Ok(new
+                {
+                    Message = "登入失敗！　帳號密碼錯誤！",
+                    JWT=""
+                });
+            
+        }
+
+        /// <summary>
+        /// 註冊成功後直接給JWT
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <returns></returns>
+        [HttpPost("ResponseJWT")]
+        public IActionResult ResponseJWT(AccountData AccountData)
+        {
+            return Ok(this._AccountService.ResponseJWT(AccountData.Account, false));
+        }
+
+        
     }
 }
