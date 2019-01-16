@@ -86,7 +86,7 @@ namespace WebAPI_DEMO.Controllers
                 {
                     return Ok(new {
                         Message = "登入成功！",
-                        JWT = this._AccountService.ResponseJWT(request.Account, false) });
+                        JWT = this._AccountService.ResponseJWT(request.Account) });
                 }
             }
                 return Ok(new
@@ -105,7 +105,14 @@ namespace WebAPI_DEMO.Controllers
         [HttpPost("ResponseJWT")]
         public IActionResult ResponseJWT(AccountData AccountData)
         {
-            return Ok(this._AccountService.ResponseJWT(AccountData.Account, false));
+            return Ok(this._AccountService.ResponseJWT(AccountData.Account));
+        }
+
+        [HttpPost("LogOut")]
+        public IActionResult LogOut(AccountData AccountData)
+        {
+            _AccountService.LogOut(AccountData.Account);
+            return Ok("登出成功！");
         }
 
         

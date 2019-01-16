@@ -52,6 +52,8 @@ namespace WebAPI_DEMO
 
             services.AddScoped<IAccountService, AccountService>();
 
+            services.AddScoped<IRedisService, RedisService>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
                {

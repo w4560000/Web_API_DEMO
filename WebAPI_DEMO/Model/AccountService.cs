@@ -18,16 +18,19 @@ namespace WebAPI_DEMO.Model
 {
     public class AccountService :IAccountService
     {
-        private FOR_VUEContext _dbContext;
-        public IConfiguration Configuration;
+        private FOR_VUEContext _DbContext;
+        private IConfiguration _Configuration;
+        private IRedisService _RedisService;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
-        public AccountService(FOR_VUEContext dbContext, IConfiguration configuration)
+        public AccountService(FOR_VUEContext DbContext, IConfiguration Configuration , IRedisService RedisService)
         {
-            this._dbContext = dbContext;
-            this.Configuration = configuration;
+            this._DbContext = DbContext;
+            this._Configuration = Configuration;
+            this._RedisService = RedisService;
         }
 
         public static class CustomClaimTypes
@@ -41,7 +44,7 @@ namespace WebAPI_DEMO.Model
         /// <returns></returns>
         public List<AccountData> GetAccountData()
         {
-            var result = this._dbContext.AccountData.ToList();
+            var result = this._DbContext.AccountData.ToList();
             return result;
         }
 
@@ -59,8 +62,8 @@ namespace WebAPI_DEMO.Model
                 SignupDate = DateTime.Now
             };
 
-            this._dbContext.AccountData.Add(NEWAccountData);
-            this._dbContext.SaveChanges();
+            this._DbContext.AccountData.Add(NEWAccountData);
+            this._DbContext.SaveChanges();
         }
 
         /// <summary>
@@ -72,11 +75,11 @@ namespace WebAPI_DEMO.Model
         {
             if (Account != null)
             {
-                using (var connection = new SqlConnection(Configuration.GetConnectionString("FOR_VUEContext")))
+                using (var connection = new SqlConnection(_Configuration.GetConnectionString("FOR_VUEContext")))
                 {
                     var Item = connection.Query("select * from AccountData where Account = @p1", new { p1 = Account });
 
-                    if (Item == null)
+                    if (Item.Count() == 0)
                     {
                         return true;
                     }
@@ -95,16 +98,15 @@ namespace WebAPI_DEMO.Model
         {
             if (Email != null)
             {
-                using (var connection = new SqlConnection(Configuration.GetConnectionString("FOR_VUEContext")))
+                using (var connection = new SqlConnection(_Configuration.GetConnectionString("FOR_VUEContext")))
                 {
                     var Item = connection.Query("select * from AccountData where Email = @p1 ", new { p1 = Email });
 
-                    if (Item == null)
+                    if (Item.Count() == 0)
                     {
                         return true;
                     }
                 }
-
             }
 
             return false;
@@ -152,12 +154,12 @@ namespace WebAPI_DEMO.Model
                 client.Disconnect(true);
             }
 
-            AccountData Item = this._dbContext.AccountData.Where(r => r.Email == Email).FirstOrDefault();
+            AccountData Item = this._DbContext.AccountData.Where(r => r.Email == Email).FirstOrDefault();
             Item.SendmailDate = DateTime.Now;
             Item.VerificationCode = ValidationCode;
 
 
-            this._dbContext.SaveChanges();
+            this._DbContext.SaveChanges();
         }
         
         /// <summary>
@@ -193,7 +195,7 @@ namespace WebAPI_DEMO.Model
         /// <returns></returns>
         public string CheckVerificationCode(string Account,string VerificationCode)
         {
-            var item = this._dbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
+            var item = this._DbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
 
             if (item.VerificationCode == VerificationCode)
                 return "驗證成功！";
@@ -207,7 +209,7 @@ namespace WebAPI_DEMO.Model
         /// <param name="Account">帳號</param>
         /// <param name="IsUpdatExp">是否更新JWT時效</param>
         /// <returns></returns>
-        public string ResponseJWT(string Account, bool IsUpdatExp)
+        public string ResponseJWT(string Account)
         {
             var claims = new[] {
                         //加入用户的名稱
@@ -219,29 +221,21 @@ namespace WebAPI_DEMO.Model
                                 ClaimValueTypes.Integer32)
                     };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZ1456789513"));//Encoding.UTF8.GetBytes(Configuration["JWT:SecurityKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_Configuration["JWT:SecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 
-            DateTime authTime = DateTime.UtcNow;
-            DateTime expiresAt;
-            if (IsUpdatExp)
-            {
-                //Redis連線
-                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-                IDatabase db = redis.GetDatabase(0);
 
-                var Account_Login_Date = db.HashGetAll(Account + "_Login_Date").ToList();
+            //更新該帳號登入時間
+            _RedisService.UpdateLoginDate(Account);
 
-                redis.Dispose();
+            //取得該帳號登入時間
+            DateTime Account_Login_Date = _RedisService.GetRedisDate(Account);
+            
+            //設定JWT時效為一小時
+            DateTime expiresAt = Account_Login_Date.AddHours(1); 
 
-                expiresAt = authTime;
 
-            }
-            else
-            {
-                expiresAt = authTime.AddHours(1);
-            }
             var token = new JwtSecurityToken(
                 issuer: "admin",
                 audience: Account,
@@ -261,16 +255,21 @@ namespace WebAPI_DEMO.Model
         /// <returns></returns>
         public bool SigninValidation(string Account, string PassWord)
         {
-            using (var connection = new SqlConnection(Configuration.GetConnectionString("FOR_VUEContext")))
+            using (var connection = new SqlConnection(_Configuration.GetConnectionString("FOR_VUEContext")))
             {
                 var Item = connection.Query("select * from AccountData where Account = @p1 and PassWord =@p2", new { p1 = Account, p2 = PassWord });
 
-                if (Item != null)
+                if (Item.Count() != 0)
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        public void LogOut(string Account)
+        {
+            _RedisService.DeleteLoginDate(Account);
         }
     }
 }

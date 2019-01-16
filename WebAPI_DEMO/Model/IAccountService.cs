@@ -30,10 +30,14 @@ namespace WebAPI_DEMO.Model
         //建立驗證碼
         int[] CreateValidationCode();
 
-
+        //登入驗證
         bool SigninValidation(string Account, string PassWord);
 
-        string ResponseJWT(string Account, bool IsUpdatExp);
+        //回傳JWT
+        string ResponseJWT(string Account);
+
+        //登出
+        void LogOut(string Account);
 
     }
 }
