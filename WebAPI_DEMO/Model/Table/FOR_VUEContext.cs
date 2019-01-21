@@ -17,8 +17,6 @@ namespace WebAPI_DEMO.Model.Table
 
         public virtual DbSet<AccountData> AccountData { get; set; }
 
-        
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AccountData>(entity =>
@@ -35,7 +33,7 @@ namespace WebAPI_DEMO.Model.Table
 
                 entity.Property(e => e.PassWord)
                     .IsRequired()
-                    .HasMaxLength(30);
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.SendmailDate)
                     .HasColumnName("sendmail_date")

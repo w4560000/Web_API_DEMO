@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 namespace WebAPI_DEMO.ViewModel
 {
-    public class RedisViewModel
+   
+    public class SendMailViewModel
     {
         public string Account { get; set; }
 
-        public string LoginDate { get; set; }
+        public string Email { get; set; }
+
+        public string dosomething { get; set; }
     }
 }

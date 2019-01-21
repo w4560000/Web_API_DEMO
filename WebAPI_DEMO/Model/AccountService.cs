@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using WebAPI_DEMO.Model.Table;
 using Dapper;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 
 namespace WebAPI_DEMO.Model
 {
@@ -42,28 +43,10 @@ namespace WebAPI_DEMO.Model
         /// 取得帳號基本資料
         /// </summary>
         /// <returns></returns>
-        public List<AccountData> GetAccountData()
+        public AccountData GetAccountData(string Account)
         {
-            var result = this._DbContext.AccountData.ToList();
+            var result = this._DbContext.AccountData.Where(r=>r.Account==Account).FirstOrDefault();
             return result;
-        }
-
-        /// <summary>
-        /// 註冊帳號
-        /// </summary>
-        /// <param name="AccountData">註冊帳號資料(Account & Password & Email)</param>
-        public void SignupAccount(AccountData AccountData)
-        {
-            var NEWAccountData = new AccountData()
-            {
-                Account = AccountData.Account,
-                PassWord = AccountData.PassWord,
-                Email = AccountData.Email,
-                SignupDate = DateTime.Now
-            };
-
-            this._DbContext.AccountData.Add(NEWAccountData);
-            this._DbContext.SaveChanges();
         }
 
         /// <summary>
@@ -113,10 +96,52 @@ namespace WebAPI_DEMO.Model
         }
 
         /// <summary>
+        /// 註冊帳號
+        /// </summary>
+        /// <param name="AccountData">註冊帳號資料(Account & Password & Email)</param>
+        public void SignupAccount(AccountData AccountData)
+        {
+            var NEWAccountData = new AccountData()
+            {
+                Account = AccountData.Account,
+                PassWord = GetMD5PassWord(AccountData.PassWord),
+                Email = AccountData.Email,
+                SignupDate = DateTime.Now,
+                SignupFinish = "N"
+            };
+
+            this._DbContext.AccountData.Add(NEWAccountData);
+            this._DbContext.SaveChanges();
+        }
+
+        /// <summary>
+        /// 取得MD5加密過的密碼
+        /// </summary>
+        /// <param name="PassWord"></param>
+        /// <returns></returns>
+        public string GetMD5PassWord(string PassWord)
+        {
+            StringBuilder sBuilder = new StringBuilder();
+            using (MD5 md5Hasher = MD5.Create())
+            {
+                byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(PassWord));
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    sBuilder.Append(data[i].ToString("x2"));
+                }
+            }
+            return sBuilder.ToString();
+        }
+        
+
+        
+
+        /// <summary>
         /// 寄送驗證碼
         /// </summary>
         /// <param name="Email">信箱</param>
-        public void SendMail(string Email)
+        public void SendMail(string Email,string dosomeing)
         {
              int[] ValidationCodeArray= CreateValidationCode();//產生4位驗證碼
             var ValidationCode = "";
@@ -128,7 +153,20 @@ namespace WebAPI_DEMO.Model
             
 
             var bodyBuilder = new BodyBuilder();
-            string body= "<span style=\"color:black;\">安安你好!恭喜中毒囉~</span> <br/><br/> <span style=\"color:black;\">It's joking! Don't worry~!</span><br/><br/><br/><br/>";
+            string body = "";
+
+            switch (dosomeing)
+            {
+                case "signup":
+                     body += "<span style=\"color:black;\">安安你好!恭喜中毒囉~</span> <br/><br/> <span style=\"color:black;\">It's joking! Don't worry~!</span><br/><br/><br/><br/>";
+                    break;
+                case "reset_password":
+                     body += "<span style=\"color:black;\">安安你好!</span> <br/><br/><span style=\"color:black;\">輸入完驗證碼即可重設密碼！</span><br/><br/><br/><br/>";
+                    break;
+                case "resendemail":
+                    body += "<span style=\"color:black;\">安安你好</span> <br/><br/> <span style=\"color:black;\">這是系統重發的驗證信　有收到嗎？？？？？</span><br/><br/><br/><br/>";
+                    break;
+            }
 
             body += "<span style=\"font-size:20px;color:black;\">Hello</span><br/><span style=\"font-size:20px;color:black;\">This is 鄭秉庠's .Net Core Mail Test!</span><br/>";
 
@@ -161,7 +199,28 @@ namespace WebAPI_DEMO.Model
 
             this._DbContext.SaveChanges();
         }
-        
+
+        /// <summary>
+        /// 註冊完成後，確認使用者輸入的驗證碼是否正確
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="VerificationCode">四位驗證碼</param>
+        /// <returns></returns>
+        public string CheckVerificationCode(string Account, string VerificationCode)
+        {
+            var item = this._DbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
+
+            if (item.VerificationCode == VerificationCode)
+            {
+                item.SignupFinish = "Y";
+                this._DbContext.SaveChanges();
+
+                return "驗證成功！";
+            }
+            else
+                return "驗證失敗！請確認驗證碼是否輸入正確！";
+        }
+
         /// <summary>
         /// 產生四位驗證碼
         /// </summary>
@@ -186,21 +245,81 @@ namespace WebAPI_DEMO.Model
 
             return randomArray;
         }
-        
+
         /// <summary>
-        /// 註冊完成後，確認使用者輸入的驗證碼是否正確
+        /// 帳號登入，驗證帳密
         /// </summary>
         /// <param name="Account">帳號</param>
-        /// <param name="VerificationCode">四位驗證碼</param>
+        /// <param name="PassWord">密碼</param>
         /// <returns></returns>
-        public string CheckVerificationCode(string Account,string VerificationCode)
+        public bool SigninValidation(string Account, string PassWord)
+        {
+            using (var connection = new SqlConnection(_Configuration.GetConnectionString("FOR_VUEContext")))
+            {
+                var Item = connection.Query("select * from AccountData where Account = @p1 and PassWord =@p2", new { p1 = Account, p2 = GetMD5PassWord(PassWord) });
+
+                if (Item.Count() != 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 登入前確認是否認證過驗證碼
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <returns></returns>
+        public bool CheckSignupFinish(string Account)
         {
             var item = this._DbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
 
-            if (item.VerificationCode == VerificationCode)
-                return "驗證成功！";
+            if (item.SignupFinish == "Y")
+            {
+                item.SigninDate = DateTime.Now;
+                this._DbContext.SaveChanges();
+
+                return true;
+            }
             else
-                return "驗證失敗！請確認驗證碼是否輸入正確！";
+                return false;
+        }
+
+        /// <summary>
+        /// 確認帳號與信箱是否是同一人所有
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="Email">信箱</param>
+        /// <returns></returns>
+        public string CheckAccount_Email_for_reset_PassWord_or_resendEmail(string Account, string Email)
+        {
+            var Item = GetAccountData(Account);
+            if (Item != null)
+            {
+                if (Item.Email == Email)
+                    return "正確";
+                else
+                    return "信箱錯誤";
+            }
+            else
+            {
+                return "無此帳號";
+            }
+        }
+
+        /// <summary>
+        /// 重置密碼
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="PassWord">密碼</param>
+        public void ResetPassWord(string Account, string PassWord)
+        {
+            var Item = this._DbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
+
+
+            Item.PassWord = GetMD5PassWord(PassWord);
+            this._DbContext.SaveChanges();
         }
 
         /// <summary>
@@ -224,8 +343,6 @@ namespace WebAPI_DEMO.Model
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_Configuration["JWT:SecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-
-
             //更新該帳號登入時間
             _RedisService.UpdateLoginDate(Account);
 
@@ -243,30 +360,13 @@ namespace WebAPI_DEMO.Model
                 expires: expiresAt,
                 signingCredentials: creds);
 
-           
              return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
+       
         /// <summary>
-        /// 帳號登入，驗證帳密
+        /// 登出
         /// </summary>
         /// <param name="Account">帳號</param>
-        /// <param name="PassWord">密碼</param>
-        /// <returns></returns>
-        public bool SigninValidation(string Account, string PassWord)
-        {
-            using (var connection = new SqlConnection(_Configuration.GetConnectionString("FOR_VUEContext")))
-            {
-                var Item = connection.Query("select * from AccountData where Account = @p1 and PassWord =@p2", new { p1 = Account, p2 = PassWord });
-
-                if (Item.Count() != 0)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public void LogOut(string Account)
         {
             _RedisService.DeleteLoginDate(Account);
