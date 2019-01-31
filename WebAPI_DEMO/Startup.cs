@@ -43,7 +43,7 @@ namespace WebAPI_DEMO
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("http://localhost:8081")
+                    policy.WithOrigins("https://localhost:8081")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -70,7 +70,7 @@ namespace WebAPI_DEMO
                });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("TrainedStaffOnly",
+                options.AddPolicy("User",
                     policy => policy.RequireClaim("CompletedBasicTraining")  //身分
                     .AddRequirements(new Auth_Middle(1))   //驗證額外參數
                     );

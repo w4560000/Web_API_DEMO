@@ -25,26 +25,27 @@ namespace WebAPI_DEMO.Security
                     AuthorizationHandlerContext context,
                     Auth_Middle requirement)
             {
-                if (context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced) != null)
-                {
-                    
 
-                    var parameter = context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced).Value;
-                    if (requirement.testpa == int.Parse(parameter))
-                    {
-                        //REDIS TEST
-                        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
 
-                        IDatabase db = redis.GetDatabase(0);
-                        db.StringSet("test1", context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced).Value);
+                //var parameter = context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced).Value;
+                //if (requirement.testpa == int.Parse(parameter))
+                //{
+                //REDIS TEST
+                
+                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("182.155.24.37:6379");
 
-                        db.HashSet("LoginAccount", new HashEntry[] { new HashEntry(context.User.FindFirst(claim => claim.Type == "aud").Value + "_Login_Date", context.User.FindFirst(claim => claim.Type == "exp").Value) });
+                IDatabase db = redis.GetDatabase(0);
 
-                        redis.Dispose();
+                //db.HashSet("LoginAccountDate", new HashEntry[] { new HashEntry(context.User.FindFirst(claim => claim.Type == "aud").Value , context.User.FindFirst(claim => claim.Type == "exp").Value) });
 
-                        context.Succeed(requirement);
-                    }
-                }
+                //每次request需要驗證的action時，更新JWT時間(代表該user有在使用)
+                db.HashSet("LoginAccountDate", new HashEntry[] { new HashEntry(context.User.FindFirst(claim => claim.Type == "aud").Value, DateTime.Now.ToString()) });
+
+                redis.Dispose();
+
+                context.Succeed(requirement);
+                //}
+
                 return Task.CompletedTask;
 
             }

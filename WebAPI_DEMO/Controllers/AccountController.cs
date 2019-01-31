@@ -11,7 +11,7 @@ using WebAPI_DEMO.ViewModel;
 
 namespace WebAPI_DEMO.Controllers
 {
-    //[Authorize(Policy = "TrainedStaffOnly")]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -135,7 +135,7 @@ namespace WebAPI_DEMO.Controllers
         [HttpPost("ResponseJWT")]
         public IActionResult ResponseJWT(AccountData AccountData)
         {
-            return Ok(this._AccountService.ResponseJWT(AccountData.Account));
+            return Ok( new { jwt = this._AccountService.ResponseJWT(AccountData.Account) });
         }
 
 
@@ -152,6 +152,20 @@ namespace WebAPI_DEMO.Controllers
             return Ok("登出成功！");
         }
 
-        
+        [Authorize(Policy = "User")]
+        [HttpPost("UpLoadImage")]
+        public IActionResult UpLoadImage(UploadImage uploadImage)
+        {
+            return Ok(_AccountService.UpLoadImage(uploadImage.Account, uploadImage.base64data));
+        }
+
+        [Authorize(Policy = "User")]
+        [HttpPost("GetImage")]
+        public IActionResult GetImage(UploadImage uploadImage)
+        {
+            return Ok(_AccountService.GetImage(uploadImage.Account));
+        }
+
+
     }
 }

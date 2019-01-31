@@ -14,4 +14,11 @@ namespace WebAPI_DEMO.ViewModel
 
         public string dosomething { get; set; }
     }
+
+    public class UploadImage
+    {
+        public string Account { get; set; }
+
+        public string base64data { get; set; }
+    }
 }

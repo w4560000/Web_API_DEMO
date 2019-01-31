@@ -14,20 +14,21 @@ using WebAPI_DEMO.Model.Table;
 using Dapper;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
+using System.IO;
 
 namespace WebAPI_DEMO.Model
 {
-    public class AccountService :IAccountService
+    public class AccountService : IAccountService
     {
         private FOR_VUEContext _DbContext;
         private IConfiguration _Configuration;
         private IRedisService _RedisService;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
-        public AccountService(FOR_VUEContext DbContext, IConfiguration Configuration , IRedisService RedisService)
+        public AccountService(FOR_VUEContext DbContext, IConfiguration Configuration, IRedisService RedisService)
         {
             this._DbContext = DbContext;
             this._Configuration = Configuration;
@@ -45,7 +46,7 @@ namespace WebAPI_DEMO.Model
         /// <returns></returns>
         public AccountData GetAccountData(string Account)
         {
-            var result = this._DbContext.AccountData.Where(r=>r.Account==Account).FirstOrDefault();
+            var result = this._DbContext.AccountData.Where(r => r.Account == Account).FirstOrDefault();
             return result;
         }
 
@@ -133,24 +134,24 @@ namespace WebAPI_DEMO.Model
             }
             return sBuilder.ToString();
         }
-        
 
-        
+
+
 
         /// <summary>
         /// 寄送驗證碼
         /// </summary>
         /// <param name="Email">信箱</param>
-        public void SendMail(string Email,string dosomeing)
+        public void SendMail(string Email, string dosomeing)
         {
-             int[] ValidationCodeArray= CreateValidationCode();//產生4位驗證碼
+            int[] ValidationCodeArray = CreateValidationCode();//產生4位驗證碼
             var ValidationCode = "";
 
-             var message = new MimeMessage();
+            var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Test Project", "netcoremailtest87@gmail.com"));
             message.To.Add(new MailboxAddress("test", Email));
             message.Subject = "test send mail form asp.net core ";
-            
+
 
             var bodyBuilder = new BodyBuilder();
             string body = "";
@@ -158,10 +159,10 @@ namespace WebAPI_DEMO.Model
             switch (dosomeing)
             {
                 case "signup":
-                     body += "<span style=\"color:black;\">安安你好!恭喜中毒囉~</span> <br/><br/> <span style=\"color:black;\">It's joking! Don't worry~!</span><br/><br/><br/><br/>";
+                    body += "<span style=\"color:black;\">安安你好!恭喜中毒囉~</span> <br/><br/> <span style=\"color:black;\">It's joking! Don't worry~!</span><br/><br/><br/><br/>";
                     break;
                 case "reset_password":
-                     body += "<span style=\"color:black;\">安安你好!</span> <br/><br/><span style=\"color:black;\">輸入完驗證碼即可重設密碼！</span><br/><br/><br/><br/>";
+                    body += "<span style=\"color:black;\">安安你好!</span> <br/><br/><span style=\"color:black;\">輸入完驗證碼即可重設密碼！</span><br/><br/><br/><br/>";
                     break;
                 case "resendemail":
                     body += "<span style=\"color:black;\">安安你好</span> <br/><br/> <span style=\"color:black;\">這是系統重發的驗證信　有收到嗎？？？？？</span><br/><br/><br/><br/>";
@@ -172,9 +173,9 @@ namespace WebAPI_DEMO.Model
 
             body += "<span style=\"font-size:20px;color:black;\">Your Validation Code is : <span style=\"font-size:30px;color:red;\">";
 
-            for(int i=0;i<4;i++)
+            for (int i = 0; i < 4; i++)
             {
-                body += string.Format("{0}",ValidationCodeArray[i] ) + "  ";
+                body += string.Format("{0}", ValidationCodeArray[i]) + "  ";
                 ValidationCode += ValidationCodeArray[i];
             }
             body += "</span></span>";
@@ -333,7 +334,7 @@ namespace WebAPI_DEMO.Model
             var claims = new[] {
                         //加入用户的名稱
                         new Claim(ClaimTypes.Name,Account),
-                        new Claim("CompletedBasicTraining", ""),
+                        new Claim("CompletedBasicTraining", Account),
                         //new Claim(CustomClaimTypes.EmploymentCommenced,"EmploymentCommenced", ClaimValueTypes.String)
                          new Claim(CustomClaimTypes.testCommenced,
                                "1",
@@ -348,9 +349,9 @@ namespace WebAPI_DEMO.Model
 
             //取得該帳號登入時間
             DateTime Account_Login_Date = _RedisService.GetRedisDate(Account);
-            
+
             //設定JWT時效為一小時
-            DateTime expiresAt = Account_Login_Date.AddHours(1); 
+            DateTime expiresAt = Account_Login_Date.AddHours(1);
 
 
             var token = new JwtSecurityToken(
@@ -360,9 +361,9 @@ namespace WebAPI_DEMO.Model
                 expires: expiresAt,
                 signingCredentials: creds);
 
-             return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
-       
+
         /// <summary>
         /// 登出
         /// </summary>
@@ -370,6 +371,102 @@ namespace WebAPI_DEMO.Model
         public void LogOut(string Account)
         {
             _RedisService.DeleteLoginDate(Account);
+        }
+
+        /// <summary>
+        /// 上傳大頭貼
+        /// </summary>
+        /// <param name="Account"></param>
+        /// <param name="base64data"></param>
+        /// <param name="type"></param>
+        public string UpLoadImage(string Account, string base64data)
+        {
+            string sRtn = "";
+            var type = "";
+
+            //取得content-type
+            type = base64data.Substring(0, base64data.IndexOf(";"));
+
+            //取得圖檔完整的base64
+            base64data = base64data.Substring(base64data.IndexOf(",") + 1);
+
+            //base64轉換為byte
+            byte[] byteimage = Convert.FromBase64String(base64data);
+
+
+            //若無此資料夾則新增
+            var UpDirPath = "C://vue_image";
+            if (!System.IO.Directory.Exists(UpDirPath))
+            {
+                System.IO.Directory.CreateDirectory(UpDirPath);
+            }
+
+            //先刪除原先的大頭照
+            if (File.Exists(Path.Combine(UpDirPath, Account + "_image.jpg")))
+            {
+                File.Delete(Path.Combine(UpDirPath, Account + "_image.jpg"));
+            }
+            else if (File.Exists(Path.Combine(UpDirPath, Account + "_image.png")))
+            {
+                File.Delete(Path.Combine(UpDirPath, Account + "_image.png"));
+            }
+
+            //判斷副檔名並建立檔案
+            if (type.Contains("jpeg"))
+            {
+                System.IO.File.WriteAllBytes(Path.Combine(UpDirPath, Account + "_image.jpg"), byteimage);
+                sRtn = "上傳成功！";
+            }
+            else if (type.Contains("png"))
+            {
+                System.IO.File.WriteAllBytes(Path.Combine(UpDirPath, Account + "_image.png"), byteimage);
+                sRtn = "上傳成功！";
+            }
+            else
+                sRtn = "上傳失敗！請上傳JPF檔orPNG檔！";
+
+            return sRtn;
+        }
+        /// <summary>
+        /// 回傳大頭照
+        /// </summary>
+        /// <param name="Account"></param>
+        /// <returns></returns>
+        public string GetImage(string Account)
+        {
+            string UpDirPath = "C://vue_image";
+            string type = "";
+            string[] imagePaths = { };
+
+            //抓去圖檔
+            if (File.Exists(Path.Combine(UpDirPath, Account + "_image.jpg")))
+            {
+                 imagePaths = Directory.GetFiles(UpDirPath, "*.jpg");
+                type = "data:image / jpeg; base64,";
+            }
+            else  if (File.Exists(Path.Combine(UpDirPath, Account + "_image.png")))
+            {
+                 imagePaths = Directory.GetFiles(UpDirPath, "*.png");
+                type = "data:image/png;base64,";
+            }
+
+            //若抓不到圖檔，代表該帳號無上傳大頭貼
+            if (imagePaths.Count() > 0)
+            {
+                //file轉為byte再轉為base64
+                FileStream fs = new FileStream(imagePaths[0], FileMode.Open);
+                byte[] buffer = new byte[fs.Length];
+                fs.Read(buffer, 0, buffer.Length);
+                fs.Close();
+
+                string Base64Str = Convert.ToBase64String(buffer);
+
+                Base64Str = string.Concat(type, Base64Str);
+
+                return Base64Str;
+            }
+            else
+                return "";
         }
     }
 }

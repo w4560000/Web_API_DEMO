@@ -51,5 +51,10 @@ namespace WebAPI_DEMO.Model
         //登出
         void LogOut(string Account);
 
+        //上傳大頭照
+        string UpLoadImage(string Account, string base64data);
+
+        //回傳大頭照至前端
+        string GetImage(string Account);
     }
 }
