@@ -32,7 +32,7 @@ namespace WebAPI_DEMO.Security
                 //{
                 //REDIS TEST
                 
-                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("182.155.24.37:6379");
+                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
 
                 IDatabase db = redis.GetDatabase(0);
 
