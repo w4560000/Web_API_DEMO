@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BX.Web.Model;
+using BX.Web.Model.Table;
+using BX.Web.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WebAPI_DEMO.Model;
-using WebAPI_DEMO.Model.Table;
-using WebAPI_DEMO.Security;
-using static WebAPI_DEMO.Security.Auth_Middle;
+using System.Text;
+using static BX.Web.Security.Auth_Middle;
 
 namespace WebAPI_DEMO
 {
@@ -26,7 +19,7 @@ namespace WebAPI_DEMO
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -36,14 +29,14 @@ namespace WebAPI_DEMO
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(Configuration.GetConnectionString("FOR_VUEContext")));
+            services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("FOR_VUEContext")));
 
             services.AddCors(options =>
             {
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("https://182.155.24.37")
+                    policy.WithOrigins("http://localhost:1111")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -65,7 +58,7 @@ namespace WebAPI_DEMO
                        ValidateIssuerSigningKey = true,
                        ValidIssuer = "admin",
                         //ValidAudience = "lilibuy.com",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:SecurityKey"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["JWT:SecurityKey"]))
                    };
                });
             services.AddAuthorization(options =>

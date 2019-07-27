@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace WebAPI_DEMO.Model.Table
+namespace BX.Web.Model.Table
 {
     public partial class AccountData
     {

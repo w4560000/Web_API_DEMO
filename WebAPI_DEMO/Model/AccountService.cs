@@ -1,22 +1,19 @@
-﻿using MailKit.Net.Smtp;
+﻿using BX.Web.Model.Table;
+using Dapper;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
-using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPI_DEMO.Model.Table;
-using Dapper;
-using System.Data.SqlClient;
 using System.Security.Cryptography;
-using System.IO;
+using System.Text;
 
-namespace WebAPI_DEMO.Model
+namespace BX.Web.Model
 {
     public class AccountService : IAccountService
     {
@@ -186,7 +183,7 @@ namespace WebAPI_DEMO.Model
             using (var client = new SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate("netcoremailtest87@gmail.com", "test.0123");
+                client.Authenticate("testbingxiang@gmail.com", "a33456789");
 
                 client.Send(message);
 

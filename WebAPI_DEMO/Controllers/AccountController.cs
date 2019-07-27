@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BX.Web.Model;
+using BX.Web.Model.Table;
+using BX.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using WebAPI_DEMO.Model;
-using WebAPI_DEMO.Model.Table;
-using WebAPI_DEMO.ViewModel;
 
-namespace WebAPI_DEMO.Controllers
+namespace BX.Web.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -88,7 +83,7 @@ namespace WebAPI_DEMO.Controllers
                 {
                     if (this._AccountService.CheckSignupFinish(request.Account))
                     {
-                        return Ok(new
+                        return this.Ok(new
                         {
                             Message = "登入成功！",
                             JWT = this._AccountService.ResponseJWT(request.Account)
@@ -96,7 +91,7 @@ namespace WebAPI_DEMO.Controllers
                     }
                     else
                     {
-                        return Ok(new
+                        return this.Ok(new
                         {
                             Message = "您的信箱尚未完成驗證程序！",
                             JWT = ""
@@ -104,7 +99,7 @@ namespace WebAPI_DEMO.Controllers
                     }
                 }
             }
-            return Ok(new
+            return this.Ok(new
             {
                 Message = "登入失敗！　帳號密碼錯誤！",
                 JWT = ""
@@ -116,14 +111,14 @@ namespace WebAPI_DEMO.Controllers
         {
             if (this._AccountService.CheckAccount_Email_for_reset_PassWord_or_resendEmail(data.Account, data.Email) == "正確")
             {
-                this._AccountService.SendMail(data.Email, data.dosomething);
-                if (data.dosomething == "reset_password")
-                    return Ok("請輸入驗證碼以重設密碼！");
+                this._AccountService.SendMail(data.Email, data.Dosomething);
+                if (data.Dosomething == "reset_password")
+                    return this.Ok("請輸入驗證碼以重設密碼！");
                 else
-                    return Ok("驗證信已重寄，請確認!");
+                    return this.Ok("驗證信已重寄，請確認!");
             }
             else
-                return Ok(this._AccountService.CheckAccount_Email_for_reset_PassWord_or_resendEmail(data.Account, data.Email));
+                return this.Ok(this._AccountService.CheckAccount_Email_for_reset_PassWord_or_resendEmail(data.Account, data.Email));
         }
 
 
@@ -135,7 +130,7 @@ namespace WebAPI_DEMO.Controllers
         [HttpPost("ResponseJWT")]
         public IActionResult ResponseJWT(AccountData AccountData)
         {
-            return Ok( new { jwt = this._AccountService.ResponseJWT(AccountData.Account) });
+            return this.Ok( new { jwt = this._AccountService.ResponseJWT(AccountData.Account) });
         }
 
 
@@ -143,27 +138,33 @@ namespace WebAPI_DEMO.Controllers
         public IActionResult ResetPassWord(AccountData AccountData)
         {
             this._AccountService.ResetPassWord(AccountData.Account, AccountData.PassWord);
-            return Ok("重設密碼成功！");
+            return this.Ok("重設密碼成功！");
         }
         [HttpPost("LogOut")]
         public IActionResult LogOut(AccountData AccountData)
         {
-            _AccountService.LogOut(AccountData.Account);
-            return Ok("登出成功！");
+            this._AccountService.LogOut(AccountData.Account);
+            return this.Ok("登出成功！");
         }
 
         [Authorize(Policy = "User")]
         [HttpPost("UpLoadImage")]
         public IActionResult UpLoadImage(UploadImage uploadImage)
         {
-            return Ok(_AccountService.UpLoadImage(uploadImage.Account, uploadImage.base64data));
+            return this.Ok(this._AccountService.UpLoadImage(uploadImage.Account, uploadImage.Base64data));
         }
 
         [Authorize(Policy = "User")]
         [HttpPost("GetImage")]
         public IActionResult GetImage(UploadImage uploadImage)
         {
-            return Ok(_AccountService.GetImage(uploadImage.Account));
+            return this.Ok(this._AccountService.GetImage(uploadImage.Account));
+        }
+
+        [HttpGet("check")]
+        public string Check()
+        {
+            return "ok";
         }
 
 

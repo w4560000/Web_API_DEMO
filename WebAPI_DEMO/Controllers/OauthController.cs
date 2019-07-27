@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BX.Web.Model.Table;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using WebAPI_DEMO.Model.Table;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
-namespace WebAPI_DEMO.Controllers
+namespace BX.Web.Controllers
 {
     [AllowAnonymous]
     [Route("api/[controller]")]
@@ -22,7 +19,7 @@ namespace WebAPI_DEMO.Controllers
 
         public OauthController(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
         }
 
         public static class CustomClaimTypes
@@ -49,7 +46,7 @@ namespace WebAPI_DEMO.Controllers
                                 ClaimValueTypes.Integer32)
                     };
 
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:SecurityKey"]));
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["JWT:SecurityKey"]));
                     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                     var authTime = DateTime.UtcNow;
@@ -62,7 +59,7 @@ namespace WebAPI_DEMO.Controllers
                         expires: expiresAt,
                         signingCredentials: creds);
 
-                    return Ok(new
+                    return this.Ok(new
                     {
                         access_token = new JwtSecurityTokenHandler().WriteToken(token),
                         token_type = "Bearer",

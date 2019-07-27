@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace WebAPI_DEMO.Model.Table
+namespace BX.Web.Model.Table
 {
     public partial class FOR_VUEContext : DbContext
     {

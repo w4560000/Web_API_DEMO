@@ -1,11 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebAPI_DEMO.ViewModel;
 
-namespace WebAPI_DEMO.Model
+namespace BX.Web.Model
 {
     public class RedisService : IRedisService
     {

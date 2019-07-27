@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using static WebAPI_DEMO.Controllers.OauthController;
 
-namespace WebAPI_DEMO.Security
+namespace BX.Web.Security
 {
     public class Auth_Middle : IAuthorizationRequirement
     {
 
 
-        public int testpa { get; private set; }
+        public int Testpa { get; private set; }
 
         public Auth_Middle(int pa1)
         {
-            this.testpa = pa1;
+            this.Testpa = pa1;
         }
 
         public class Auth_MiddleHandler : AuthorizationHandler<Auth_Middle>
