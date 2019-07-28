@@ -1,4 +1,7 @@
-﻿using BX.Web.Model;
+﻿using BX.Repository;
+using BX.Repository.Base;
+using BX.Service;
+using BX.Web.Model;
 using BX.Web.Model.Table;
 using BX.Web.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,7 +46,12 @@ namespace WebAPI_DEMO
                 });
             });
 
-            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IRepositoryFactory, RepositoryFactory>();
+            services.AddScoped<ISQLServerConnectionBase, SQLServerConnectionBase>();
+
+            //services.AddScoped(typeof(IGenericRepository<AccountData>), typeof(AccountRepository));
+
+            services.AddScoped<ISAccountService, SAccountService>();
 
             services.AddScoped<IRedisService, RedisService>();
 
