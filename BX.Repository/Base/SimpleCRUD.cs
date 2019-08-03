@@ -8,17 +8,30 @@ using Dapper;
 
 namespace BX.Repository.Base
 {
+    /// <summary>
+    /// 封裝Dapper簡單的CRUD
+    /// </summary>
     public static class SimpleCRUD
     {
+        /// <summary>
+        /// 資料欄位名稱
+        /// </summary>
         private static readonly IDictionary<string, string> ColumnNames = new Dictionary<string, string>();
 
+        /// <summary>
+        /// 資料表名稱
+        /// </summary>
         private static readonly IDictionary<Type, string> TableNames = new Dictionary<Type, string>();
 
-        private static string _parameterPrefix;
+        /// <summary>
+        /// 參數前符號
+        /// </summary>
+        private static string _parameterPrefix = "@";
 
+        /// <summary>
+        /// 
+        /// </summary>
         private static string _encapsulation = @"""{0}""";
-
-        private static string _getIdentitySql = "SELECT CAST(SCOPE_IDENTITY()  AS BIGINT) AS [id]";
 
         private static ITableNameResolver _tableNameResolver = new TableNameResolver();
 
@@ -399,7 +412,7 @@ namespace BX.Repository.Base
             /// <param name="tableName"></param>
             public TableAttribute(string tableName)
             {
-                Name = tableName;
+                this.Name = tableName;
             }
 
             /// <summary>

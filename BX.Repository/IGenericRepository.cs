@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BX.Repository
+﻿namespace BX.Repository
 {
     /// <summary>
     /// 基礎儲存庫介面

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MiniProfiler.Integrations;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;

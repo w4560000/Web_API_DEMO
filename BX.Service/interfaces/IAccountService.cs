@@ -2,7 +2,7 @@
 
 namespace BX.Service
 {
-    public interface ISAccountService
+    public interface IAccountService
     {
 
         AccountData Test();

@@ -1,6 +1,4 @@
-﻿using BX.Repository;
-using Microsoft.Extensions.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 using System.Transactions;
 
@@ -20,6 +18,11 @@ namespace BX.Repository.Base
         /// SQL SERVER連線
         /// </summary>
         private ISQLServerConnectionBase SqlServerConnectionBase;
+
+        /// <summary>
+        /// 建構子
+        /// </summary>
+        /// <param name="sqlServerConnectionBase">SQL SERVER連線</param>
         public RepositoryBase(
             ISQLServerConnectionBase sqlServerConnectionBase)
         {
@@ -65,7 +68,5 @@ namespace BX.Repository.Base
                 this.Disposed = true;
             }
         }
-
-        //System.Configuration.ConfigurationManager.ConnectionStrings[this.ConnectionKey].ConnectionString
     }
 }

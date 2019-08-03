@@ -30,7 +30,7 @@ namespace WebAPI_DEMO
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("FOR_VUEContext")));
 
@@ -39,7 +39,7 @@ namespace WebAPI_DEMO
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("http://localhost:1111")
+                    policy.WithOrigins("http://localhost:8787")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -51,7 +51,7 @@ namespace WebAPI_DEMO
 
             //services.AddScoped(typeof(IGenericRepository<AccountData>), typeof(AccountRepository));
 
-            services.AddScoped<ISAccountService, SAccountService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             services.AddScoped<IRedisService, RedisService>();
 

@@ -4,24 +4,40 @@ using BX.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BX.Service;
+using System.Linq;
+using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace BX.Web.Controllers
 {
-
-    [Route("api/[controller]")]
+    /// <summary>
+    /// 帳號 API Controller
+    /// </summary>
+    [Route("[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
-        //private IAccountService _AccountService;
+        /// <summary>
+        /// 帳號服務
+        /// </summary>
+        private IAccountService AccountService;
 
-        private ISAccountService SAccountService;
+        private FOR_VUEContext _DbContext;
+        private IConfiguration _Configuration;
 
+
+        /// <summary>
+        /// 建構子
+        /// </summary>
+        /// <param name="AccountService"></param>
         public AccountController(
-            //IAccountService AccountService ,
-            ISAccountService sAccountService)
+            IAccountService AccountService,
+            FOR_VUEContext DbContext,
+            IConfiguration configuration)
         {
-            //this._AccountService = AccountService;
-            this.SAccountService = sAccountService;
+            this.AccountService = AccountService;
+            this._DbContext = DbContext;
+            this._Configuration = configuration;
         }
 
         ///// <summary>
@@ -167,12 +183,29 @@ namespace BX.Web.Controllers
         //    return this.Ok(this._AccountService.GetImage(uploadImage.Account));
         //}
 
+        /// <summary>
+        /// 測試
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("check")]
         public string Check()
         {
-            return this.SAccountService.Test().Account;
+
+
+
+            return this.AccountService.Test().Account;
         }
 
+        [HttpGet("test")]
+        public string Test()
+        {
+            //var a = this._DbContext.AccountData.Where(r => r.Account == "w4560000").FirstOrDefault().Account;
 
+            //using (SqlConnection cn = new SqlConnection(this._Configuration.GetConnectionString("FOR_VUEContext")))
+            //{
+            //    cn.Open(); // 在此發生【 ORA-12154: TNS: 無法解析指定的連線 ID 】的錯誤
+            //}
+            return "a";
+        }
     }
 }

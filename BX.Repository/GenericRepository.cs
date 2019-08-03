@@ -1,21 +1,25 @@
 ﻿using BX.Repository.Base;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Data;
 using System.Linq;
 
 namespace BX.Repository
 {
-    //public class GenericRepository<TEntity> : RepositoryBase<TEntity> , IGenericRepository<TEntity> where TEntity : class
+    /// <summary>
+    /// 基礎儲存庫介面
+    /// </summary>
+    /// <typeparam name="TEntity">資料庫物件</typeparam>
     public class GenericRepository<TEntity> : RepositoryBase
     {
         /// <summary>
-        /// Track whether Dispose has been called.
+        /// 資料庫連線
         /// </summary>
-        private bool Disposed = false;
-
         private IDbConnection connection;
 
+        /// <summary>
+        /// 建構子
+        /// </summary>
+        /// <param name="sqlServerConnectionBase"></param>
         public GenericRepository(ISQLServerConnectionBase sqlServerConnectionBase) : base(sqlServerConnectionBase)
         {
             this.connection = sqlServerConnectionBase.Connection;
@@ -37,16 +41,32 @@ namespace BX.Repository
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="entity">資料庫物件</param>
+        /// <returns>是否新增成功</returns>
         public bool Add(TEntity entity)
         {
             return this.Connection.Insert(entity);
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity">資料庫物件</param>
+        /// <returns>是否更新成功</returns>
         public bool Update(TEntity entity)
         {
             return this.Connection.Update(entity);
         }
 
+        /// <summary>
+        /// 根據條件取得物件
+        /// </summary>
+        /// <param name="conditions">條件</param>
+        /// <param name="parameters">參數</param>
+        /// <returns>資料庫物件</returns>
         public TEntity Get(string conditions, object parameters = null)
         {
             return this.Connection.GetList<TEntity>(conditions , parameters).SingleOrDefault();

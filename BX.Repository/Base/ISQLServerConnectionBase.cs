@@ -1,15 +1,11 @@
-﻿using MiniProfiler.Integrations;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
+﻿using System.Data;
 
 namespace BX.Repository.Base
 {
     /// <summary>
     /// 資料庫連線
     /// </summary>
-    public interface ISQLServerConnectionBase : IDbConnectionFactory
+    public interface ISQLServerConnectionBase
     {
         /// <summary>
         /// 資料庫連線
