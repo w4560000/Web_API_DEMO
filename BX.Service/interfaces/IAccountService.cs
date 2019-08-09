@@ -1,28 +1,22 @@
 ﻿using BX.Repository.Entity;
+using BX.Service.ViewModel;
 
 namespace BX.Service
 {
     public interface IAccountService
     {
 
-        AccountData Test();
+        /// <summary>
+        /// 註冊帳號流程
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
+        Result<string> SignupAccountProcess(AccountViewModel account);
+
         ////取得帳號基本資料
         //AccountData GetAccountData(string Account);
 
-        ////註冊時，確認帳號是否已被使用
-        //bool CheckAccountCanUse(string Account);
 
-        ////註冊時，確認Email是否已被使用
-        //bool CheckEmailCanUse(string Email);
-
-        ////註冊帳號
-        //void SignupAccount(AccountData AccountData);
-
-        ////取得MD5加密過的密碼
-        //string GetMD5PassWord(string PassWord);
-
-        ////註冊帳號成功後，寄送驗證碼
-        //void SendMail(string Email, string dosomeing);
 
         ////確認驗證碼是否正確
         //string CheckVerificationCode(string Account, string ValidationCode);

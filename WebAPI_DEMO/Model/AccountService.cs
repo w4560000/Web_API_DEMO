@@ -438,12 +438,12 @@
 //            //抓去圖檔
 //            if (File.Exists(Path.Combine(UpDirPath, Account + "_image.jpg")))
 //            {
-//                 imagePaths = Directory.GetFiles(UpDirPath, "*.jpg");
+//                imagePaths = Directory.GetFiles(UpDirPath, "*.jpg");
 //                type = "data:image / jpeg; base64,";
 //            }
-//            else  if (File.Exists(Path.Combine(UpDirPath, Account + "_image.png")))
+//            else if (File.Exists(Path.Combine(UpDirPath, Account + "_image.png")))
 //            {
-//                 imagePaths = Directory.GetFiles(UpDirPath, "*.png");
+//                imagePaths = Directory.GetFiles(UpDirPath, "*.png");
 //                type = "data:image/png;base64,";
 //            }
 

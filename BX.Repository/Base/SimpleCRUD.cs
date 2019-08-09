@@ -74,7 +74,7 @@ namespace BX.Repository.Base
             sb.Append("values");
             sb.Append(" (");
             BuildInsertValues(entityToInsert, sb);
-            sb.Append(")");
+            sb.Append(");SELECT CAST(SCOPE_IDENTITY()  AS BIGINT) AS [id]");
 
             IEnumerable<dynamic> r = connection.Query(sb.ToString(), entityToInsert, transaction, true, commandTimeout);
 

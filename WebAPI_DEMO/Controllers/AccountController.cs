@@ -1,12 +1,6 @@
-﻿using BX.Web.Model;
-using BX.Web.Model.Table;
-using BX.Web.ViewModel;
-using Microsoft.AspNetCore.Authorization;
+﻿using BX.Service;
+using BX.Service.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using BX.Service;
-using System.Linq;
-using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 
 namespace BX.Web.Controllers
 {
@@ -20,66 +14,48 @@ namespace BX.Web.Controllers
         /// <summary>
         /// 帳號服務
         /// </summary>
-        private IAccountService AccountService;
-
-        private FOR_VUEContext _DbContext;
-        private IConfiguration _Configuration;
-
+        private readonly IAccountService AccountService;
 
         /// <summary>
         /// 建構子
         /// </summary>
-        /// <param name="AccountService"></param>
+        /// <param name="AccountService">帳號服務</param>
         public AccountController(
-            IAccountService AccountService,
-            FOR_VUEContext DbContext,
-            IConfiguration configuration)
+            IAccountService AccountService)
         {
             this.AccountService = AccountService;
-            this._DbContext = DbContext;
-            this._Configuration = configuration;
         }
 
-        ///// <summary>
-        ///// 註冊帳號並寄送驗證碼
-        ///// </summary>
-        ///// <param name="AccountData"></param>
-        ///// <returns></returns>
-        //[HttpPost("SignupAccount")]
-        //public string SignupAccount(AccountData AccountData )
-        //{
-        //    string ErrorMessage = "";
-        //    if (this._AccountService.CheckAccountCanUse(AccountData.Account))
-        //    {
-        //        if (this._AccountService.CheckEmailCanUse(AccountData.Email))
-        //        {
-        //            this._AccountService.SignupAccount(AccountData);
-        //            this._AccountService.SendMail(AccountData.Email, "signup");
-                        
-        //        }
-        //        else
-        //        {
-        //            ErrorMessage = "該E-mail已有人使用！　請更改！";
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (this._AccountService.CheckEmailCanUse(AccountData.Email))
-        //        {
-        //            ErrorMessage = "該帳號已有人使用！　請更改！";
-        //        }
-        //        else
-        //        {
-        //            ErrorMessage = "該帳號和E-mail已有人使用！　請更改！";
-        //        }
-        //    }
+        /// <summary>
+        /// 註冊帳號並寄送驗證碼
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
+        [HttpPost("SignupAccount")]
+        public ApiResponseViewModel<string> SignupAccount(AccountViewModel AccountData)
+        {
+            ApiResponseViewModel<string> apiResult = new ApiResponseViewModel<string>();
+            Result<string> signupResult = this.AccountService.SignupAccountProcess(AccountData);
 
-        //    if (ErrorMessage == string.Empty)
-        //        return "註冊成功！";
-        //    else
-        //        return ErrorMessage;
-        //}
+            if(signupResult.Success)
+            {
+                apiResult.Code = (int)ResponseEnum.Success;
+                apiResult.Result = ResponseMessageEnum.SignupSuccess.GetEnumDescription();
+            }
+            else
+            {
+                apiResult.Code = (int)ResponseEnum.Fail;
+                apiResult.Result = string.Join(",", signupResult.ErrorMessage);
+            }
 
+            return apiResult;
+        }
+
+        [HttpGet("aaa")]
+        public string AA()
+        {
+            return "testss";
+        }
         ///// <summary>
         ///// 確認驗證碼是否正確
         ///// </summary>
@@ -182,30 +158,5 @@ namespace BX.Web.Controllers
         //{
         //    return this.Ok(this._AccountService.GetImage(uploadImage.Account));
         //}
-
-        /// <summary>
-        /// 測試
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("check")]
-        public string Check()
-        {
-
-
-
-            return this.AccountService.Test().Account;
-        }
-
-        [HttpGet("test")]
-        public string Test()
-        {
-            //var a = this._DbContext.AccountData.Where(r => r.Account == "w4560000").FirstOrDefault().Account;
-
-            //using (SqlConnection cn = new SqlConnection(this._Configuration.GetConnectionString("FOR_VUEContext")))
-            //{
-            //    cn.Open(); // 在此發生【 ORA-12154: TNS: 無法解析指定的連線 ID 】的錯誤
-            //}
-            return "a";
-        }
     }
 }

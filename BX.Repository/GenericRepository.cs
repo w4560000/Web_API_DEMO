@@ -1,5 +1,6 @@
 ﻿using BX.Repository.Base;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -67,9 +68,9 @@ namespace BX.Repository
         /// <param name="conditions">條件</param>
         /// <param name="parameters">參數</param>
         /// <returns>資料庫物件</returns>
-        public TEntity Get(string conditions, object parameters = null)
+        public IEnumerable<TEntity> Get(string conditions, object parameters = null)
         {
-            return this.Connection.GetList<TEntity>(conditions , parameters).SingleOrDefault();
+            return this.Connection.GetList<TEntity>(conditions , parameters);
         }
     }
 }
