@@ -16,7 +16,7 @@ namespace BX.Service
         /// <summary>
         /// 取得回傳結果訊息
         /// </summary>
-        public List<T> Data { get; set; }
+        public List<T> Data { get; set; } = new List<T>();
 
         /// <summary>
         /// 錯誤訊息
@@ -26,7 +26,7 @@ namespace BX.Service
         /// <summary>
         /// 成功或是失敗
         /// </summary>
-        public bool Success { get; set; } = true;
+        public int Success { get; set; } = (int)ResponseEnum.Success;
 
         /// <summary>
         /// 錯誤訊息設定, 並將Succees設為false
@@ -35,7 +35,7 @@ namespace BX.Service
         /// <param name="exc">錯誤例外訊息</param>
         public void SetError(string errorMessage, Exception exc = null)
         {
-            this.Success = false;
+            this.Success = (int)ResponseEnum.Fail;
             this.Exception = exc;
 
             this.ErrorMessage.Add(errorMessage);

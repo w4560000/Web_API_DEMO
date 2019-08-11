@@ -1,0 +1,13 @@
+﻿<span style="font-size:20px;color:black;">
+	This is 鄭秉庠's .Net Core Mail Test!
+</span>
+
+<br/>
+<br/>
+
+<span style="color:black;">
+	 $AccountName$ 安安
+</span> 
+
+<br/>
+<br/>

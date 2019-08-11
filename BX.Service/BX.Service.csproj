@@ -5,13 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="2.1.2" />
-    <PackageReference Include="MimeKit" Version="2.2.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BX.Repository\BX.Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AppData\EmailTemplate\Header.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AppData\EmailTemplate\Signup.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AppData\EmailTemplate\ValidationCode.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace BX.Web
+﻿using BX.Service;
+
+namespace BX.Web
 {
     /// <summary>
     /// api 輸出的 Model
@@ -9,7 +11,7 @@
         /// <summary>
         /// 代碼
         /// </summary>
-        public int Code { get; set; }
+        public int Code { get; set; } = (int)ResponseEnum.Fail;
 
         /// <summary>
         /// 結果

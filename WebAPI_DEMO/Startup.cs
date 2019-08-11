@@ -49,10 +49,8 @@ namespace WebAPI_DEMO
             services.AddScoped<IRepositoryFactory, RepositoryFactory>();
             services.AddScoped<ISQLServerConnectionBase, SQLServerConnectionBase>();
 
-            //services.AddScoped(typeof(IGenericRepository<AccountData>), typeof(AccountRepository));
-
             services.AddScoped<IAccountService, AccountService>();
-
+            services.AddScoped<IMailInfoService, MailInfoService>();
             services.AddScoped<IRedisService, RedisService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

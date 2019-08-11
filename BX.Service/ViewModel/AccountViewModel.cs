@@ -19,5 +19,10 @@
         /// 信箱
         /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// 驗證碼
+        /// </summary>
+        public string VerificationCode { get; set; }
     }
 }

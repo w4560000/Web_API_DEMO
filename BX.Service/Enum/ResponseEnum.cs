@@ -1,5 +1,8 @@
-﻿namespace BX.Web
+﻿namespace BX.Service
 {
+    /// <summary>
+    /// 回傳結果Enum
+    /// </summary>
     public enum ResponseEnum
     {
         /// <summary>

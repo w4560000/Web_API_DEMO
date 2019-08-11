@@ -1,6 +1,8 @@
 ﻿using BX.Service;
 using BX.Service.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 
 namespace BX.Web.Controllers
 {
@@ -32,40 +34,44 @@ namespace BX.Web.Controllers
         /// <param name="AccountData"></param>
         /// <returns></returns>
         [HttpPost("SignupAccount")]
-        public ApiResponseViewModel<string> SignupAccount(AccountViewModel AccountData)
+        public ApiResponseViewModel<List<string>> SignupAccount(AccountViewModel accountData)
         {
-            ApiResponseViewModel<string> apiResult = new ApiResponseViewModel<string>();
-            Result<string> signupResult = this.AccountService.SignupAccountProcess(AccountData);
+            ApiResponseViewModel<List<string>> apiResult = new ApiResponseViewModel<List<string>>();
+            try
+            {
+                Result<string> signupResult = this.AccountService.SignupAccountProcess(accountData);
 
-            if(signupResult.Success)
-            {
-                apiResult.Code = (int)ResponseEnum.Success;
-                apiResult.Result = ResponseMessageEnum.SignupSuccess.GetEnumDescription();
+                apiResult.Code = signupResult.Success;
+                apiResult.Result = signupResult.Success.Equals((int)ResponseEnum.Success) ? signupResult.Data
+                                                                                          : signupResult.ErrorMessage;
+
+                return apiResult;
             }
-            else
+            catch (Exception ex)
             {
-                apiResult.Code = (int)ResponseEnum.Fail;
-                apiResult.Result = string.Join(",", signupResult.ErrorMessage);
+                apiResult.Result.Add(ex.Message);
+
+                return apiResult;
             }
+        }
+
+        /// <summary>
+        /// 確認驗證碼是否正確
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
+        [HttpPost("CheckVerificationCode")]
+        public ApiResponseViewModel<List<string>> CheckVerificationCode(AccountViewModel accountData)
+        {
+            ApiResponseViewModel<List<string>> apiResult = new ApiResponseViewModel<List<string>>();
+            Result<string> result = this.AccountService.CheckVerificationCode(accountData.AccountName, accountData.VerificationCode);
+
+            apiResult.Code = result.Success;
+            apiResult.Result = result.Success.Equals((int)ResponseEnum.Success) ? result.Data
+                                                                                : result.ErrorMessage;
 
             return apiResult;
         }
-
-        [HttpGet("aaa")]
-        public string AA()
-        {
-            return "testss";
-        }
-        ///// <summary>
-        ///// 確認驗證碼是否正確
-        ///// </summary>
-        ///// <param name="AccountData"></param>
-        ///// <returns></returns>
-        //[HttpPost("CheckVerificationCode")]
-        //public string CheckVerificationCode(AccountData AccountData)
-        //{
-        //    return this._AccountService.CheckVerificationCode(AccountData.Account, AccountData.VerificationCode);
-        //}
 
         ///// <summary>
         ///// 登入驗證帳號密碼
@@ -73,7 +79,7 @@ namespace BX.Web.Controllers
         ///// <param name="request"></param>
         ///// <returns></returns>
         //[HttpPost("SigninValidation")]
-        //public IActionResult SigninValidation([FromBody]AccountData request)
+        //public IActionResult SigninValidation(AccountViewModel accountData)
         //{
         //    if (request != null)
         //    {

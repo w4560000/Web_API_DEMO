@@ -10,8 +10,16 @@ namespace BX.Service
         /// 註冊帳號流程
         /// </summary>
         /// <param name="AccountData"></param>
-        /// <returns></returns>
+        /// <returns>註冊結果</returns>
         Result<string> SignupAccountProcess(AccountViewModel account);
+
+        // <summary>
+        /// 驗證使用者輸入的驗證碼是否正確，完成註冊程序
+        /// </summary>
+        /// <param name="accountName">帳號</param>
+        /// <param name="verificationCode">四位驗證碼</param>
+        /// <returns>驗證結果</returns>
+        Result<string> CheckVerificationCode(string accountName, string verificationCode);
 
         ////取得帳號基本資料
         //AccountData GetAccountData(string Account);
