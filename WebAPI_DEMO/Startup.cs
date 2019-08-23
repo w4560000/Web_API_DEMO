@@ -2,18 +2,13 @@
 using BX.Repository.Base;
 using BX.Service;
 using BX.Web.Model;
-using BX.Web.Model.Table;
 using BX.Web.Security;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using System.Threading.Tasks;
 using static BX.Web.Security.Auth_Middle;
 
 namespace WebAPI_DEMO
@@ -30,9 +25,8 @@ namespace WebAPI_DEMO
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            services.AddDbContext<FOR_VUEContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("FOR_VUEContext")));
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllers();
 
             services.AddCors(options =>
             {
@@ -53,20 +47,20 @@ namespace WebAPI_DEMO
             services.AddScoped<IMailInfoService, MailInfoService>();
             services.AddScoped<IRedisService, RedisService>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-               .AddJwtBearer(options =>
-               {
-                   options.TokenValidationParameters = new TokenValidationParameters
-                   {
-                       ValidateIssuer = true,
-                       ValidateAudience = false,
-                       ValidateLifetime = true,
-                       ValidateIssuerSigningKey = true,
-                       ValidIssuer = "admin",
-                        //ValidAudience = "lilibuy.com",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["JWT:SecurityKey"]))
-                   };
-               });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //   .AddJwtBearer(options =>
+            //   {
+            //       options.TokenValidationParameters = new TokenValidationParameters
+            //       {
+            //           ValidateIssuer = true,
+            //           ValidateAudience = false,
+            //           ValidateLifetime = true,
+            //           ValidateIssuerSigningKey = true,
+            //           ValidIssuer = "admin",
+            //            //ValidAudience = "lilibuy.com",
+            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["JWT:SecurityKey"]))
+            //       };
+            //   });
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User",
@@ -90,10 +84,22 @@ namespace WebAPI_DEMO
             {
                 app.UseHsts();
             }
+            app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            });
+
+
+            // 起始路徑 測試
+            app.Run(ctx =>
+            {
+                ctx.Response.Redirect("/Account/Test"); 
+                return Task.FromResult(0);
+            });
         }
     }
 }
