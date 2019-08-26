@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -29,11 +31,10 @@ namespace BX.Repository.Base
         {
             get
             {
-
                 if (this.ConnectionInstance == null)
                 {
                     // Creates a ProfiledDbConnection instance and opens it
-                    this.ConnectionInstance = new SqlConnection(this._Configuration.GetConnectionString("FOR_VUEContext"));
+                    this.ConnectionInstance = new SqlConnection(GetBxDbConnectionFromAzureKeyVault());
                 }
 
                 return this.ConnectionInstance;
@@ -42,12 +43,12 @@ namespace BX.Repository.Base
         }
 
         /// <summary>
-        /// 取得資料庫連線字串
+        /// 建立資料庫連線
         /// </summary>
         public virtual DbConnection CreateConnection()
         {
             // 連線字串
-            string connectionString = this._Configuration.GetConnectionString("FOR_VUEContext");
+            string connectionString = GetBxDbConnectionFromAzureKeyVault();
 
             // 資料庫類型
             string providerName = this._Configuration.GetSection("ConnectionStrings").GetChildren().ToString();
@@ -56,6 +57,19 @@ namespace BX.Repository.Base
             DbConnection conn = factory.CreateConnection();
             conn.ConnectionString = connectionString;
             return conn;
+        }
+
+        /// <summary>
+        /// 取得儲存在Azure上的資料庫連線字串
+        /// </summary>
+        private static string GetBxDbConnectionFromAzureKeyVault()
+        {
+            KeyVaultClient keyVaultClient = new KeyVaultClient(
+                    new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
+
+            string connectionString = keyVaultClient.GetSecretAsync("https://bingxiangKeyvault.vault.azure.net/", "bxdbconnection").Result.Value;
+
+            return connectionString;
         }
     }
 }
