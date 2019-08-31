@@ -9,13 +9,18 @@ namespace BX.Web
     public class ApiResponseViewModel<T>
     {
         /// <summary>
-        /// 代碼
+        /// API輸出結果
         /// </summary>
-        public int Code { get; set; } = (int)ResponseEnum.Fail;
+        public bool IsSuccess { get; set; } = false;
 
         /// <summary>
-        /// 結果
+        /// 結果訊息
         /// </summary>
         public T Result { get; set; }
+
+        /// <summary>
+        /// JWTToken
+        /// </summary>
+        public string JWT { get; set; }
     }
 }

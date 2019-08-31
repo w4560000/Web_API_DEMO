@@ -19,13 +19,20 @@ namespace BX.Web.Controllers
         private readonly IAccountService AccountService;
 
         /// <summary>
+        /// Jwt服務
+        /// </summary>
+        private readonly IJwtService JwtService;
+
+        /// <summary>
         /// 建構子
         /// </summary>
         /// <param name="AccountService">帳號服務</param>
         public AccountController(
-            IAccountService AccountService)
+            IAccountService accountService,
+            IJwtService jwtService)
         {
-            this.AccountService = AccountService;
+            this.AccountService = accountService;
+            this.JwtService = jwtService;
         }
 
         /// <summary>
@@ -39,11 +46,7 @@ namespace BX.Web.Controllers
             ApiResponseViewModel<List<string>> apiResult = new ApiResponseViewModel<List<string>>();
             try
             {
-                Result<string> signupResult = this.AccountService.SignupAccountProcess(accountData);
-
-                apiResult.Code = signupResult.Success;
-                apiResult.Result = signupResult.Success.Equals((int)ResponseEnum.Success) ? signupResult.Data
-                                                                                          : signupResult.ErrorMessage;
+                apiResult = ConvertHelper.CovertToApiResponse(this.AccountService.SignupAccountProcess(accountData));
 
                 return apiResult;
             }
@@ -56,112 +59,85 @@ namespace BX.Web.Controllers
         }
 
         /// <summary>
-        /// 確認驗證碼是否正確
+        /// (註冊)確認驗證碼是否正確
         /// </summary>
         /// <param name="AccountData"></param>
         /// <returns></returns>
-        [HttpPost("CheckVerificationCode")]
-        public ApiResponseViewModel<List<string>> CheckVerificationCode(AccountViewModel accountData)
+        [HttpPost("CheckVerificationCodeForSignUp")]
+        public ApiResponseViewModel<List<string>> CheckVerificationCodeForSignUp(AccountViewModel accountData)
         {
-            ApiResponseViewModel<List<string>> apiResult = new ApiResponseViewModel<List<string>>();
-            Result<string> result = this.AccountService.CheckVerificationCode(accountData.AccountName, accountData.VerificationCode);
+            Result result = this.AccountService.CheckVerificationCode(accountData.AccountName, accountData.VerificationCode);
+            ApiResponseViewModel<List<string>> apiResult = ConvertHelper.CovertToApiResponse(result);
 
-            apiResult.Code = result.Success;
-            apiResult.Result = result.Success.Equals((int)ResponseEnum.Success) ? result.Data
-                                                                                : result.ErrorMessage;
+            if (apiResult.IsSuccess)
+            {
+                apiResult.JWT = this.JwtService.ResponseJWT(accountData.AccountName);
+            }
 
             return apiResult;
         }
 
-        [HttpGet("Test")]
-        public string Test()
+        /// <summary>
+        /// (重設密碼)確認驗證碼是否正確
+        /// </summary>
+        /// <param name="AccountData"></param>
+        /// <returns></returns>
+        [HttpPost("CheckVerificationCodeForReSetPassWord")]
+        public ApiResponseViewModel<List<string>> CheckVerificationCodeForReSetPassWord(AccountViewModel accountData)
         {
-            string RockPaperScissors(string first, string second)
-            => (first, second) switch
-            {
-                ("rock", "paper") => "rock is covered by paper. Paper wins.",
-                ("rock", "scissors") => "rock breaks scissors. Rock wins.",
-                ("paper", "rock") => "paper covers rock. Paper wins.",
-                ("paper", "scissors") => "paper is cut by scissors. Scissors wins.",
-                ("scissors", "rock") => "scissors is broken by rock. Rock wins.",
-                ("scissors", "paper") => "scissors cuts paper. Scissors wins.",
-                (_, _) => "tie"
-            };
+            Result result = this.AccountService.CheckVerificationCode(accountData.AccountName, accountData.VerificationCode);
+            ApiResponseViewModel<List<string>> apiResult = ConvertHelper.CovertToApiResponse(result);
 
-            return RockPaperScissors(default, default);
+            return apiResult;
         }
 
-        ///// <summary>
-        ///// 登入驗證帳號密碼
-        ///// </summary>
-        ///// <param name="request"></param>
-        ///// <returns></returns>
-        //[HttpPost("SigninValidation")]
-        //public IActionResult SigninValidation(AccountViewModel accountData)
-        //{
-        //    if (request != null)
-        //    {
-        //        if (this._AccountService.SigninValidation(request.Account, request.PassWord))
-        //        {
-        //            if (this._AccountService.CheckSignupFinish(request.Account))
-        //            {
-        //                return this.Ok(new
-        //                {
-        //                    Message = "登入成功！",
-        //                    JWT = this._AccountService.ResponseJWT(request.Account)
-        //                });
-        //            }
-        //            else
-        //            {
-        //                return this.Ok(new
-        //                {
-        //                    Message = "您的信箱尚未完成驗證程序！",
-        //                    JWT = ""
-        //                });
-        //            }
-        //        }
-        //    }
-        //    return this.Ok(new
-        //    {
-        //        Message = "登入失敗！　帳號密碼錯誤！",
-        //        JWT = ""
-        //    });
-        //}
+        /// <summary>
+        /// 登入驗證帳號密碼
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("Signin")]
+        public ApiResponseViewModel<List<string>> Signin(AccountViewModel accountData)
+        {
+            Result result = this.AccountService.Signin(accountData);
+            ApiResponseViewModel<List<string>> apiResult = ConvertHelper.CovertToApiResponse(result);
 
-        //[HttpPost("check_reset_PassWord_or_resendEmail")]
-        //public IActionResult Check_reset_PassWord_or_resendEmail(SendMailViewModel data)
-        //{
-        //    if (this._AccountService.CheckAccount_Email_for_reset_PassWord_or_resendEmail(data.Account, data.Email) == "正確")
-        //    {
-        //        this._AccountService.SendMail(data.Email, data.Dosomething);
-        //        if (data.Dosomething == "reset_password")
-        //            return this.Ok("請輸入驗證碼以重設密碼！");
-        //        else
-        //            return this.Ok("驗證信已重寄，請確認!");
-        //    }
-        //    else
-        //        return this.Ok(this._AccountService.CheckAccount_Email_for_reset_PassWord_or_resendEmail(data.Account, data.Email));
-        //}
+            if (apiResult.IsSuccess)
+            {
+                apiResult.JWT = this.JwtService.ResponseJWT(accountData.AccountName);
+            }
 
+            return apiResult;
+        }
 
-        ///// <summary>
-        ///// 註冊成功後直接給JWT
-        ///// </summary>
-        ///// <param name="Account">帳號</param>
-        ///// <returns></returns>
-        //[HttpPost("ResponseJWT")]
-        //public IActionResult ResponseJWT(AccountData AccountData)
-        //{
-        //    return this.Ok( new { jwt = this._AccountService.ResponseJWT(AccountData.Account) });
-        //}
+        /// <summary>
+        /// 重寄驗證信用以重設密碼
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost("ReSendEmailForReSetPassWord")]
+        public ApiResponseViewModel<List<string>> ReSendEmailForReSetPassWord(AccountViewModel accountData)
+        {
+            Result result = this.AccountService.ReSendEmailForReSetPassWord(accountData);
+            ApiResponseViewModel<List<string>> apiResult = ConvertHelper.CovertToApiResponse(result);
 
+            return apiResult;
+        }
 
-        //[HttpPost("ResetPassWord")]
-        //public IActionResult ResetPassWord(AccountData AccountData)
-        //{
-        //    this._AccountService.ResetPassWord(AccountData.Account, AccountData.PassWord);
-        //    return this.Ok("重設密碼成功！");
-        //}
+        /// <summary>
+        /// 重設密碼
+        /// </summary>
+        /// <param name="accountData">帳戶資訊</param>
+        /// <returns></returns>
+        [HttpPost("ResetPassWord")]
+        public ApiResponseViewModel<List<string>> ResetPassWord(AccountViewModel accountData)
+        {
+            Result result = this.AccountService.ResetPassWord(accountData);
+            ApiResponseViewModel<List<string>> apiResult = ConvertHelper.CovertToApiResponse(result);
+
+            return apiResult;
+        }
+
         //[HttpPost("LogOut")]
         //public IActionResult LogOut(AccountData AccountData)
         //{

@@ -13,6 +13,8 @@ namespace BX.Service
     /// </summary>
     public class AccountService : BaseService, IAccountService
     {
+        private Result Result;
+
         /// <summary>
         /// 帳號儲存庫
         /// </summary>
@@ -41,25 +43,24 @@ namespace BX.Service
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns></returns>
-        public Result<string> SignupAccountProcess(AccountViewModel account)
+        public Result SignupAccountProcess(AccountViewModel account)
         {
-            Result<string> result = new Result<string>();
-
             (bool canUse, List<string> message) = this.CheckAccountCanUse(account);
 
             if (canUse)
             {
                 this.SignupAccount(account);
-                result.SetMessage(ResponseMessageEnum.SignupSuccess.GetEnumDescription());
+                this.Result.SetMessage(ResponseMessageEnum.SignupSuccess.GetEnumDescription());
             }
             else
             {
-                message.ForEach(x => result.SetError(x));
+                this.Result.SetErrorMode();
+                message.ForEach(x => this.Result.SetMessage(x));
 
-                return result;
+                return this.Result;
             }
 
-            return result;
+            return this.Result;
         }
 
         /// <summary>
@@ -68,10 +69,9 @@ namespace BX.Service
         /// <param name="accountName">帳號名稱</param>
         /// <param name="verificationCode">四位驗證碼</param>
         /// <returns>驗證結果</returns>
-        public Result<string> CheckVerificationCode(string accountName, string verificationCode)
+        public Result CheckVerificationCode(string accountName, string verificationCode)
         {
-            Result<string> result = new Result<string>();
-            var item = this.AccountRepository.Get("WHERE AccountName = @accountName", new { accountName }).FirstOrDefault();
+            Account item = this.GetAccountData(accountName);
 
             if (item.VerificationCode.Equals(verificationCode))
             {
@@ -79,14 +79,97 @@ namespace BX.Service
                 bool isUpdateSuccess = this.AccountRepository.Update(item);
 
                 if (isUpdateSuccess)
-                    result.SetMessage(ResponseMessageEnum.ValidateSuccess.GetEnumDescription());
+                    this.Result.SetMessage(ResponseMessageEnum.ValidateSuccess.GetEnumDescription());
                 else
-                    result.SetError(ResponseMessageEnum.UpdateError.GetEnumDescription());
+                    this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.UpdateError.GetEnumDescription());
             }
             else
-                result.SetError(ResponseMessageEnum.ValidateFail.GetEnumDescription());
+                this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.ValidateFail.GetEnumDescription());
 
-            return result;
+            return this.Result;
+        }
+
+        /// <summary>
+        /// 帳號登入，驗證帳密
+        /// </summary>
+        /// <param name="account">帳號資訊</param>
+        /// <returns>登入結果</returns>
+        public Result Signin(AccountViewModel account)
+        {
+            Account item = this.GetAccountData(account.AccountName);
+
+            try
+            {
+                if (item != null)
+                {
+                    if (Md5Hash.GetMd5Hash(account.PassWord).Equals(item.PassWord))
+                    {
+                        if (item.SignupFinish)
+                        {
+                            this.Result.SetMessage(ResponseMessageEnum.ValidateSuccess.GetEnumDescription());
+
+                            return this.Result;
+                        }
+                        throw new AccountException(ResponseMessageEnum.EmailUnAuthentication.GetEnumDescription());
+                    }
+                }
+
+                throw new AccountException();
+            }
+            catch (AccountException ex)
+            {
+                this.Result.SetErrorMode().SetMessage(ex.Message ?? ResponseMessageEnum.SigninFail.GetEnumDescription());
+
+                return this.Result;
+            }
+        }
+
+        /// <summary>
+        /// 確認帳號與信箱是否是同一人所有
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="Email">信箱</param>
+        /// <returns></returns>
+        public Result ReSendEmailForReSetPassWord(AccountViewModel accountViewModel)
+        {
+            Account Item = this.GetAccountData(accountViewModel.AccountName);
+            if (Item != null)
+            {
+                if (Item.Email == accountViewModel.Email)
+                {
+                    this.SendMail(accountViewModel, MailEnum.ReSetPassWordVerificationCode);
+                    this.Result.SetMessage(ResponseMessageEnum.ReSetPassWordVerificationCode.GetEnumDescription());
+
+                    return this.Result;
+                }
+            }
+
+            this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.AccountNameEmailNotExist.GetEnumDescription());
+
+            return this.Result;
+        }
+
+        /// <summary>
+        /// 重置密碼
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="PassWord">密碼</param>
+        public Result ResetPassWord(string accountName, string passWord)
+        {
+            Account item = this.GetAccountData(accountName);
+
+            item.PassWord = Md5Hash.GetMd5Hash(passWord);
+
+            bool isInsertSuccess = this.AccountRepository.Update(item);
+
+            if (!isInsertSuccess)
+            {
+                throw new Exception(ResponseMessageEnum.UpdateError.GetEnumDescription());
+            }
+
+            this.Result.SetMessage(ResponseMessageEnum.ReSetPassWordSuccess.GetEnumDescription());
+
+            return this.Result;
         }
 
         /// <summary>
@@ -99,14 +182,11 @@ namespace BX.Service
             List<string> errorMessage = new List<string>();
             if (account != null)
             {
-                bool isAccountExist = this.AccountRepository
-                                     .Get("WHERE AccountName = @AccountName", new { account.AccountName })
-                                     .FirstOrDefault() != null;
+                bool isAccountExist = this.GetAccountData(account.AccountName) != null;
 
                 bool isMailExist = this.AccountRepository
                                        .Get("WHERE Email = @Email", new { account.Email })
                                        .FirstOrDefault() != null;
-
 
                 if (isAccountExist)
                     errorMessage.Add(ResponseMessageEnum.AccountNameUsed.GetEnumDescription());
@@ -121,7 +201,6 @@ namespace BX.Service
 
             return (!errorMessage.Any(), errorMessage);
         }
-
 
         /// <summary>
         /// 註冊帳號
@@ -149,6 +228,17 @@ namespace BX.Service
         }
 
         /// <summary>
+        /// 取得帳號資料
+        /// </summary>
+        /// <param name="accountName">帳號名稱</param>
+        /// <returns></returns>
+        private Account GetAccountData(string accountName)
+        {
+            return this.AccountRepository
+                       .Get("WHERE AccountName = @AccountName", new { AccountName = accountName }).FirstOrDefault();
+        }
+
+        /// <summary>
         /// 寄信
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
@@ -167,7 +257,6 @@ namespace BX.Service
             SendEmailDto emailDto = new SendEmailDto();
             emailDto.To.Add(accountData.Email);
             emailDto.ViewFile = mailEnum.GetEmailValue();
-
 
             this.MailInfoService.SendMail(emailTemplateDto, emailDto, accountData);
         }

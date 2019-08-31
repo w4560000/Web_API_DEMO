@@ -61,13 +61,13 @@ namespace WebAPI_DEMO
             //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["JWT:SecurityKey"]))
             //       };
             //   });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("User",
-                    policy => policy.RequireClaim("CompletedBasicTraining")  //身分
-                    .AddRequirements(new Auth_Middle(1))   //驗證額外參數
-                    );
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("User",
+            //        policy => policy.RequireClaim("CompletedBasicTraining")  //身分
+            //        .AddRequirements(new Auth_Middle(1))   //驗證額外參數
+            //        );
+            //});
             services.AddSingleton<IAuthorizationHandler,Auth_MiddleHandler>();
 
 

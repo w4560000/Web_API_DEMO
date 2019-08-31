@@ -1,17 +1,15 @@
-﻿using BX.Repository.Entity;
-using BX.Service.ViewModel;
+﻿using BX.Service.ViewModel;
 
 namespace BX.Service
 {
     public interface IAccountService
     {
-
         /// <summary>
         /// 註冊帳號流程
         /// </summary>
         /// <param name="AccountData"></param>
         /// <returns>註冊結果</returns>
-        Result<string> SignupAccountProcess(AccountViewModel account);
+        Result SignupAccountProcess(AccountViewModel account);
 
         // <summary>
         /// 驗證使用者輸入的驗證碼是否正確，完成註冊程序
@@ -19,21 +17,29 @@ namespace BX.Service
         /// <param name="accountName">帳號</param>
         /// <param name="verificationCode">四位驗證碼</param>
         /// <returns>驗證結果</returns>
-        Result<string> CheckVerificationCode(string accountName, string verificationCode);
+        Result CheckVerificationCode(string accountName, string verificationCode);
 
-        ////取得帳號基本資料
-        //AccountData GetAccountData(string Account);
+        /// <summary>
+        /// 帳號登入，驗證帳密
+        /// </summary>
+        /// <param name="account">帳號資訊</param>
+        /// <returns>登入結果</returns>
+        Result Signin(AccountViewModel account);
 
+        /// <summary>
+        /// 確認帳號與信箱是否是同一人所有
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="Email">信箱</param>
+        /// <returns>結果</returns>
+        Result ReSendEmailForReSetPassWord(AccountViewModel accountViewModel);
 
-
-        ////確認驗證碼是否正確
-        //string CheckVerificationCode(string Account, string ValidationCode);
-
-        ////建立驗證碼
-        //int[] CreateValidationCode();
-
-        ////登入驗證
-        //bool SigninValidation(string Account, string PassWord);
+        /// <summary>
+        /// 重置密碼
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        /// <param name="PassWord">密碼</param>
+        Result ResetPassWord(AccountViewModel accountViewModel);
 
         ////確認信箱是否認證過驗證碼
         //bool CheckSignupFinish(string Account);

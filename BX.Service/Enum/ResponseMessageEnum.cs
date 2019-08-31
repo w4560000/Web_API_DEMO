@@ -25,12 +25,15 @@ namespace BX.Service
         [Description("該信箱已被使用！")]
         EmailUsed,
 
+        [Description("帳號或信箱輸入錯誤！")]
+        AccountNameEmailNotExist,
+
         /// <summary>
         /// 資料庫新增失敗
         /// </summary>
         [Description("新增失敗！")]
         InsertError,
-        
+
         /// <summary>
         /// 資料庫更新失敗
         /// </summary>
@@ -55,5 +58,19 @@ namespace BX.Service
         [Description("驗證失敗！請確認驗證碼是否輸入正確！")]
         ValidateFail,
 
+        [Description("登入成功！")]
+        SigninSuccess,
+
+        [Description("登入失敗！請確認帳號密碼是否正確！")]
+        SigninFail,
+
+        [Description("登入失敗！信箱未認證！")]
+        EmailUnAuthentication,
+
+        [Description("驗證信已重寄，請輸入驗證碼後重設密碼。")]
+        ReSetPassWordVerificationCode,
+
+        [Description("重設密碼成功！")]
+        ReSetPassWordSuccess,
     }
 }

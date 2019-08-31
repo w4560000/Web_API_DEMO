@@ -7,28 +7,13 @@ namespace BX.Web.Security
 {
     public class Auth_Middle : IAuthorizationRequirement
     {
-
-
-        public int Testpa { get; private set; }
-
-        public Auth_Middle(int pa1)
-        {
-            this.Testpa = pa1;
-        }
-
         public class Auth_MiddleHandler : AuthorizationHandler<Auth_Middle>
         {
             protected override Task HandleRequirementAsync(
                     AuthorizationHandlerContext context,
                     Auth_Middle requirement)
             {
-
-
-                //var parameter = context.User.FindFirst(claim => claim.Type == CustomClaimTypes.testCommenced).Value;
-                //if (requirement.testpa == int.Parse(parameter))
-                //{
-                //REDIS TEST
-                
+                //authorizationFilterContext.Result = new JsonResult("Need a custom message") { StatusCode = 418 };
                 ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
 
                 IDatabase db = redis.GetDatabase(0);
@@ -41,7 +26,6 @@ namespace BX.Web.Security
                 redis.Dispose();
 
                 context.Succeed(requirement);
-                //}
 
                 return Task.CompletedTask;
 
