@@ -13,7 +13,7 @@ namespace BX.Service
     /// </summary>
     public class AccountService : BaseService, IAccountService
     {
-        private Result Result;
+        private Result Result = new Result();
 
         /// <summary>
         /// 帳號儲存庫
@@ -26,16 +26,24 @@ namespace BX.Service
         private readonly IMailInfoService MailInfoService;
 
         /// <summary>
+        /// Redis服務
+        /// </summary>
+        private readonly IRedisService RedisService;
+
+        /// <summary>
         /// 建構子
         /// </summary>
-        /// <param name="repositoryFactory">儲存庫</param>
+        /// <param name="repositoryFactory">基礎儲存庫</param>
         /// <param name="mailInfoService">信件內容設定服務</param>
+        /// <param name="redisService">Redis服務</param>
         public AccountService(
             IRepositoryFactory repositoryFactory,
-            IMailInfoService mailInfoService) : base(repositoryFactory)
+            IMailInfoService mailInfoService,
+            IRedisService redisService) : base(repositoryFactory)
         {
             this.AccountRepository = this.CreateService<Account>();
             this.MailInfoService = mailInfoService;
+            this.RedisService = redisService;
         }
 
         /// <summary>
@@ -173,6 +181,18 @@ namespace BX.Service
         }
 
         /// <summary>
+        /// 登出
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        public Result SignOut(string account)
+        {
+            this.RedisService.DeleteAccountLoginDate(account);
+            this.Result.SetMessage(ResponseMessageEnum.SignOutSucces.GetEnumDescription());
+
+            return this.Result;
+        }
+
+        /// <summary>
         /// 檢查帳號可否使用
         /// </summary>
         /// <param name="accountName"></param>
@@ -216,7 +236,8 @@ namespace BX.Service
                 PassWord = Md5Hash.GetMd5Hash(account.PassWord),
                 Email = account.Email,
                 SignupDate = DateTime.Now,
-                SendMailDate = DateTime.Now
+                SendMailDate = DateTime.Now,
+                VerificationCode = account.VerificationCode
             };
 
             bool isInsertSuccess = this.AccountRepository.Add(entity);

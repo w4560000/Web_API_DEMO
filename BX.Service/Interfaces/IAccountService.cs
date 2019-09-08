@@ -39,22 +39,13 @@ namespace BX.Service
         /// </summary>
         /// <param name="Account">帳號</param>
         /// <param name="PassWord">密碼</param>
-        Result ResetPassWord(AccountViewModel accountViewModel);
+        Result ResetPassWord(string accountName, string passWord);
 
-        ////確認信箱是否認證過驗證碼
-        //bool CheckSignupFinish(string Account);
-
-        ////確認帳號與信箱是否是同一人所有
-        //string CheckAccount_Email_for_reset_PassWord_or_resendEmail(string Account, string Email);
-
-        ////重置密碼
-        //void ResetPassWord(string Account, string PassWord);
-
-        ////回傳JWT
-        //string ResponseJWT(string Account);
-
-        ////登出
-        //void LogOut(string Account);
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <param name="Account">帳號</param>
+        public Result SignOut(string account);
 
         ////上傳大頭照
         //string UpLoadImage(string Account, string base64data);

@@ -67,6 +67,9 @@ namespace BX.Service
         [Description("登入失敗！信箱未認證！")]
         EmailUnAuthentication,
 
+        [Description("登出成功！")]
+        SignOutSucces,
+
         [Description("驗證信已重寄，請輸入驗證碼後重設密碼。")]
         ReSetPassWordVerificationCode,
 

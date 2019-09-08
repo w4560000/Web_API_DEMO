@@ -19,6 +19,9 @@
     <None Update="AppData\EmailTemplate\Header.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="AppData\EmailTemplate\ReSetPassWord.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="AppData\EmailTemplate\Signup.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

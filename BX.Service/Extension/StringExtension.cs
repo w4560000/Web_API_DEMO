@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace BX.Service
 {
@@ -60,6 +63,40 @@ namespace BX.Service
             } while (!input.IndexOf("$").Equals(-1));
 
             return input;
+        }
+
+        /// <summary>
+        /// JSON字串轉物件
+        /// </summary>
+        /// <typeparam name="T">物件類型</typeparam>
+        /// <param name="s">JSON字串</param>
+        /// <returns>物件</returns>
+        public static T ToTypedObject<T>(this string s)
+        {
+            // 去掉字串的前後空白、換行、tab 符號
+            s = s?.Trim('\r', '\n', '\t', ' ');
+            if (s.IsNullOrEmpty() || !Regex.IsMatch(s, @"^(\[|\{)(.|\n)*(\]|\})$", RegexOptions.Compiled))
+            {
+                return default;
+            }
+
+            return JsonConvert.DeserializeObject<T>(s);
+        }
+
+        /// <summary>
+        /// 物件轉JSON字串
+        /// </summary>
+        /// <param name="target">物件</param>
+        /// <param name="isCamelCase">JSON鍵值是否為小駝峰，預設true</param>
+        /// <returns>JSON字串</returns>
+        public static string ToJson(this object target, bool isCamelCase = true)
+        {
+            JsonSerializerSettings setting = new JsonSerializerSettings()
+            {
+                ContractResolver = isCamelCase ? new CamelCasePropertyNamesContractResolver() : new DefaultContractResolver()
+            };
+
+            return JsonConvert.SerializeObject(target, Newtonsoft.Json.Formatting.None, setting);
         }
     }
 }
