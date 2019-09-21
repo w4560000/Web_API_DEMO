@@ -1,0 +1,45 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .Net Core sdk 3.0.100-preview8-013656'
+  inputs:
+    version: '3.0.100-preview8-013656'
+    includePreviewVersions: true
+
+# - powershell: |
+#    $globaljson = '{"sdk": {"version": "3.0.100-preview8-013656"}}';
+#    $globaljson | out-file './test.app/global.json' -Encoding UTF8
+#   displayName: 'Global Json'
+
+- task: PowerShell@2
+  displayName: 'Global Json'
+  inputs:
+    targetType: 'inline'
+    script: 'dotnet new globaljson --sdk-version 3.0.100-preview8-013656'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet 5.x'
+  inputs:
+    versionSpec: 5.x
+    checkLatest: true
+
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
