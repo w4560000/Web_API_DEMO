@@ -139,7 +139,7 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>登出結果</returns>
-        [HttpPost("Logout")]
+        [Authorize, HttpPost("Logout")]
         public ApiResponseViewModel<List<string>> LogOut(AccountViewModel accountData)
         {
             ApiResponseViewModel<List<string>> apiResult = this.AccountService.SignOut(accountData.AccountName).CovertToApiResponse();
