@@ -28,7 +28,8 @@ steps:
     restoreSolution: '$(Parameters.solution)'
 
 - task: VSBuild@1
-  displayName: 'Build solution **\*.sln'
   inputs:
-    solution: '$(Parameters.solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPubli
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
