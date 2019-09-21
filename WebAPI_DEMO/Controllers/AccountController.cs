@@ -99,7 +99,7 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>登入結果</returns>
-        [Authorize, ReFreshJwtFilter]
+        [ReFreshJwtFilter]
         [HttpPost("Signin")]
         public ApiResponseViewModel<List<string>> Signin(AccountViewModel accountData)
         {

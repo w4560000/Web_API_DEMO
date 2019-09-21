@@ -31,17 +31,18 @@ namespace WebAPI_DEMO
             services.AddControllers();
             services.AddCors();
 
-            //services.AddCors(options =>
-            //{
-            //    // CorsPolicy 是自訂的 Policy 名稱
-            //    options.AddPolicy("CorsPolicy", policy =>
-            //    {
-            //        policy.WithOrigins("http://localhost:44319")
-            //              .AllowAnyHeader()
-            //              .AllowAnyMethod()
-            //              .AllowCredentials();
-            //    });
-            //});
+            services.AddCors(options =>
+            {
+                // CorsPolicy 是自訂的 Policy 名稱
+                options.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.WithOrigins("http://localhost:9999")
+                          .WithOrigins("https://bx-vue.azurewebsites.net/")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
 
             services.AddScoped<IRepositoryFactory, RepositoryFactory>();
             services.AddScoped<ISQLServerConnectionBase, SQLServerConnectionBase>();
@@ -126,13 +127,6 @@ namespace WebAPI_DEMO
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
-            });
-
-            // 起始路徑 測試
-            app.Run(ctx =>
-            {
-                ctx.Response.Redirect("/Account/Test");
-                return Task.FromResult(0);
             });
         }
     }
