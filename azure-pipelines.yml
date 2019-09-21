@@ -16,10 +16,10 @@ steps:
     version: '3.0.100-preview8-013656'
     includePreviewVersions: true
 
-- powershell: |
-   $globaljson = '{"sdk": {"version": "3.0.100-preview8-013656"}}';
-   $globaljson | out-file './test.app/global.json' -Encoding UTF8
-  displayName: 'Global Json'
+# - powershell: |
+#    $globaljson = '{"sdk": {"version": "3.0.100-preview8-013656"}}';
+#    $globaljson | out-file './test.app/global.json' -Encoding UTF8
+#   displayName: 'Global Json'
 
 - task: NuGetToolInstaller@1
   displayName: 'Use NuGet 5.x'
