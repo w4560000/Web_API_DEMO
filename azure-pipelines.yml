@@ -1,9 +1,13 @@
-pool:
+trigger:
+- master
 
-  name: Azure Pipelines
-  demands:
-  - msbuild
-  - visualstudio
+pool:
+  vmImage: 'windows-2019'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
 - task: UseDotNet@2
@@ -30,6 +34,6 @@ steps:
 
 - task: VSBuild@1
   inputs:
-    solution: '**\*.sln'
+    solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
