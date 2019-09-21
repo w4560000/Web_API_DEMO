@@ -1,4 +1,5 @@
 pool:
+
   name: Azure Pipelines
   demands:
   - msbuild
@@ -29,6 +30,6 @@ steps:
 
 - task: VSBuild@1
   inputs:
-    solution: '$(solution)'
+    solution: '**\*.sln'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
