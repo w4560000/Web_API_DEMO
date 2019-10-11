@@ -15,7 +15,7 @@
         /// <summary>
         /// 設定訊息
         /// </summary>
-        /// <param name="message">訊息</param>
-        void SetMessage(string message);
+        /// <param name="responseMessageEnum">回傳訊息列舉</param>
+        void SetMessage(ResponseMessageEnum responseMessageEnum);
     }
 }

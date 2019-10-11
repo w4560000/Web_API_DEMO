@@ -10,12 +10,12 @@ namespace BX.Service
     public enum MailEnum
     {
         [EmailInfo(Title = "Test Mail From 鄭秉庠", Href = "Signup.txt,ValidationCode.txt")]
-        AccountSignupVerificationCode,
+        AccountSignupVerificationCode = 1,
 
         [EmailInfo(Title = "Test Mail From 鄭秉庠", Href = "ReSend.txt,ValidationCode.txt")]
-        ReSendVerificationCode,
+        ReSendVerificationCode = 2,
 
         [EmailInfo(Title = "Test Mail From 鄭秉庠", Href = "ReSetPassWord.txt,ValidationCode.txt")]
-        ReSetPassWordVerificationCode,
+        ReSetPassWordVerificationCode = 3,
     }
 }

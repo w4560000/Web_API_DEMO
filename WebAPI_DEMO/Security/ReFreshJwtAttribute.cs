@@ -30,15 +30,15 @@ namespace BX.Web.Security
                 {
                     if (response.IsSuccess)
                     {
-                        response.JWT = context.HttpContext.RequestServices.GetService<IJwtService>()
-                                                                          .ResponseJWT(this.CurrentAccountName);
+                        response.JwtData.Account = this.CurrentAccountName;
+                        response.JwtData.Jwt = context.HttpContext.RequestServices.GetService<IJwtService>().ResponseJWT(this.CurrentAccountName);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// action動作前 先把request 的 帳號名稱記下來  
+        /// action動作前 先把request 的 帳號名稱記下來
         /// </summary>
         /// <param name="context">ActionExecutingContext</param>
         public override void OnActionExecuting(ActionExecutingContext context)

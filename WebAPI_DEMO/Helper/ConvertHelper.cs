@@ -18,7 +18,8 @@ namespace BX.Web
             return new ApiResponseViewModel<List<string>>()
             {
                 IsSuccess = result.IsSuccess,
-                Result = result.Message
+                Result = result.Message,
+                ResponseStatusCode = result.ResponseStatusCode
             };
         }
     }

@@ -58,7 +58,7 @@ namespace BX.Service
             if (canUse)
             {
                 this.SignupAccount(account);
-                this.Result.SetMessage(ResponseMessageEnum.SignupSuccess.GetEnumDescription());
+                this.Result.SetMessage(ResponseMessageEnum.SignupSuccess);
             }
             else
             {
@@ -87,12 +87,12 @@ namespace BX.Service
                 bool isUpdateSuccess = this.AccountRepository.Update(item);
 
                 if (isUpdateSuccess)
-                    this.Result.SetMessage(ResponseMessageEnum.ValidateSuccess.GetEnumDescription());
+                    this.Result.SetMessage(ResponseMessageEnum.ValidateSuccess);
                 else
-                    this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.UpdateError.GetEnumDescription());
+                    this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.UpdateError);
             }
             else
-                this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.ValidateFail.GetEnumDescription());
+                this.Result.SetErrorMode().SetMessage(ResponseMessageEnum.ValidateFail);
 
             return this.Result;
         }
@@ -114,7 +114,7 @@ namespace BX.Service
                     {
                         if (item.SignupFinish)
                         {
-                            this.Result.SetMessage(ResponseMessageEnum.ValidateSuccess.GetEnumDescription());
+                            this.Result.SetMessage(ResponseMessageEnum.SigninSuccess);
 
                             return this.Result;
                         }
@@ -122,11 +122,11 @@ namespace BX.Service
                     }
                 }
 
-                throw new AccountException();
+                throw new AccountException(ResponseMessageEnum.SigninFail.GetEnumDescription());
             }
             catch (AccountException ex)
             {
-                this.Result.SetErrorMode().SetMessage(ex.Message ?? ResponseMessageEnum.SigninFail.GetEnumDescription());
+                this.Result.SetErrorMode().SetMessage(ex.Message);
 
                 return this.Result;
             }
@@ -145,7 +145,26 @@ namespace BX.Service
             {
                 if (Item.Email == accountViewModel.Email)
                 {
-                    this.SendMail(accountViewModel, MailEnum.ReSetPassWordVerificationCode);
+                    this.SendMail(accountViewModel, accountViewModel.ResendMailType);
+
+                    Account entity = new Account()
+                    {
+                        Id = Item.Id,
+                        AccountName = Item.AccountName,
+                        PassWord = Item.PassWord,
+                        Email = Item.Email,
+                        SignupDate = Item.SignupDate,
+                        SendMailDate = DateTime.Now,
+                        VerificationCode = accountViewModel.VerificationCode
+                    };
+
+                    bool isUpdateSuccess = this.AccountRepository.Update(entity);
+
+                    if (!isUpdateSuccess)
+                    {
+                        throw new Exception(ResponseMessageEnum.UpdateError.GetEnumDescription());
+                    }
+
                     this.Result.SetMessage(ResponseMessageEnum.ReSetPassWordVerificationCode.GetEnumDescription());
 
                     return this.Result;

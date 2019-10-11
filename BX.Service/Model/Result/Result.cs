@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BX.Service
 {
@@ -8,9 +10,14 @@ namespace BX.Service
     public class Result : IResult
     {
         /// <summary>
-        /// 訊息
+        /// 回傳訊息
         /// </summary>
         public List<string> Message { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// 回傳狀態碼
+        /// </summary>
+        public string ResponseStatusCode { get; private set; }
 
         /// <summary>
         /// 成功或是失敗
@@ -33,9 +40,36 @@ namespace BX.Service
         /// 設定訊息
         /// </summary>
         /// <param name="message">訊息</param>
-        public void SetMessage(string message)
+        public void SetMessage(ResponseMessageEnum responseMessageEnum)
         {
+            string message = responseMessageEnum.GetEnumDescription();
+
             this.Message.Add(message);
+            this.ResponseStatusCode = this.SetResponseStatusCode(message);
+        }
+
+        /// <summary>
+        /// 設定訊息
+        /// </summary>
+        /// <param name="message">訊息</param>
+        public void SetMessage(string exceptionMessage)
+        {
+            this.Message.Add(exceptionMessage);
+            this.ResponseStatusCode = this.SetResponseStatusCode(exceptionMessage);
+        }
+
+        /// <summary>
+        /// 設定回傳狀態碼
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private string SetResponseStatusCode(string message)
+        {
+            return Enum.GetValues(typeof(ResponseMessageEnum))
+                       .Cast<ResponseMessageEnum>()
+                       .Where(s => s.GetEnumDescription().Equals(message))
+                       .FirstOrDefault()
+                       .GetEnumAttributeOfType<ResponseStatusAttribute>().StatusCode;
         }
     }
 }

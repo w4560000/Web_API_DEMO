@@ -19,8 +19,13 @@ namespace BX.Web
         public T Result { get; set; }
 
         /// <summary>
+        /// 回傳狀態碼
+        /// </summary>
+        public string ResponseStatusCode { get; set; }
+
+        /// <summary>
         /// JWTToken
         /// </summary>
-        public string JWT { get; set; }
+        public JwtTokenViewModel JwtData { get; set; } = new JwtTokenViewModel();
     }
 }

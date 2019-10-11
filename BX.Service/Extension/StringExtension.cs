@@ -47,7 +47,9 @@ namespace BX.Service
         public static string ReplaceString<T>(string input , T model)
         {
             Dictionary<string, string> dic = model.GetType().GetProperties().ToDictionary
-                                                (prop => prop.Name, prop => prop.GetValue(model).ToString());
+                                                (prop => prop.Name, prop => prop.GetValue(model) == null ? 
+                                                                                string.Empty : 
+                                                                                prop.GetValue(model).ToString());
             int firstIndex = 0;
             int secondIndex = 0;
             string replace = "";

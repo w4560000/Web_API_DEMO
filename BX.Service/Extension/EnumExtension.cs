@@ -36,7 +36,7 @@ namespace BX.Service
         {
             // 取得 enumVal 物件的類型
             Type type = enumVal.GetType();
-            EmailInfoAttribute displayAttr = enumVal.GetEmailEnumAttributeOfType<EmailInfoAttribute>();
+            EmailInfoAttribute displayAttr = enumVal.GetEnumAttributeOfType<EmailInfoAttribute>();
 
             // FlagsAttribute 自訂屬性陣列有值
             if (type.GetCustomAttributes(typeof(FlagsAttribute), false).Any())
@@ -57,7 +57,7 @@ namespace BX.Service
                     if (enumVal.HasFlag(flag) && ((int)(object)enumVal) > 0 && ((int)(object)flag) != 0)
                     {
                         // 抓 EmailInfoAttribute 的公用值
-                        displayAttr = flag.GetEmailEnumAttributeOfType<EmailInfoAttribute>();
+                        displayAttr = flag.GetEnumAttributeOfType<EmailInfoAttribute>();
 
                         sb.Append(sep);
                         sb.Append(displayAttr == null ? flag.ToString() : displayAttr.GetDisplay(prop));
@@ -79,7 +79,7 @@ namespace BX.Service
         /// <typeparam name="T">The type of the attribute you want to retrieve</typeparam>
         /// <param name="enumVal">The enum value</param>
         /// <returns>The attribute of type T that exists on the enum value</returns>
-        private static T GetEmailEnumAttributeOfType<T>(this Enum enumVal) where T : Attribute
+        public static T GetEnumAttributeOfType<T>(this Enum enumVal) where T : Attribute
         {
             // 取得 enumVal 物件的類型
             Type type = enumVal.GetType();

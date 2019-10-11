@@ -66,16 +66,11 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>確認結果</returns>
-        [HttpPost("CheckVerificationCodeForSignUp")]
+        [HttpPost("CheckVerificationCodeForSignUp"), ReFreshJwtFilter]
         public ApiResponseViewModel<List<string>> CheckVerificationCodeForSignUp(AccountViewModel accountData)
         {
             ApiResponseViewModel<List<string>> apiResult = this.AccountService.CheckVerificationCode(accountData.AccountName, accountData.VerificationCode)
                                                                               .CovertToApiResponse();
-
-            if (apiResult.IsSuccess)
-            {
-                apiResult.JWT = this.JwtService.ResponseJWT(accountData.AccountName);
-            }
 
             return apiResult;
         }
@@ -99,8 +94,7 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>登入結果</returns>
-        [ReFreshJwtFilter]
-        [HttpPost("Signin")]
+        [HttpPost("Signin"), ReFreshJwtFilter]
         public ApiResponseViewModel<List<string>> Signin(AccountViewModel accountData)
         {
             ApiResponseViewModel<List<string>> apiResult = this.AccountService.Signin(accountData).CovertToApiResponse();
@@ -139,7 +133,7 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>登出結果</returns>
-        [Authorize, HttpPost("Logout")]
+        [HttpPost("Logout")]
         public ApiResponseViewModel<List<string>> LogOut(AccountViewModel accountData)
         {
             ApiResponseViewModel<List<string>> apiResult = this.AccountService.SignOut(accountData.AccountName).CovertToApiResponse();
@@ -152,16 +146,10 @@ namespace BX.Web.Controllers
         /// </summary>
         /// <param name="accountData">帳號資訊</param>
         /// <returns>Jwt</returns>
-        [HttpPost("ResponseJwt")]
+        [HttpPost("ResponseJwt"), ReFreshJwtFilter]
         public ApiResponseViewModel<List<string>> ResponseJwt(AccountViewModel accountData)
         {
-            ApiResponseViewModel<List<string>> apiResult = new ApiResponseViewModel<List<string>>()
-            {
-                IsSuccess = true,
-                JWT = this.JwtService.ResponseJWT(accountData.AccountName)
-            };
-
-            return apiResult;
+            return new ApiResponseViewModel<List<string>>();
         }
 
         //[Authorize(Policy = "User")]
