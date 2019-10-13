@@ -64,12 +64,7 @@ namespace BX.Repository.Base
         /// </summary>
         private static string GetBxDbConnectionFromAzureKeyVault()
         {
-            KeyVaultClient keyVaultClient = new KeyVaultClient(
-                    new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
-
-            string connectionString = keyVaultClient.GetSecretAsync("https://bingxiangKeyvault.vault.azure.net/", "bxdbconnection").Result.Value;
-
-            return connectionString;
+            return AzureKeyvaultHelper.GetAzureSecretVaule("bxdbconnection");
         }
     }
 }

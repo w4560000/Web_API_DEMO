@@ -1,6 +1,7 @@
 ﻿using BX.Service;
 using BX.Service.ViewModel;
 using BX.Web.Security;
+using BX.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,6 +22,11 @@ namespace BX.Web.Controllers
         private readonly IAccountService AccountService;
 
         /// <summary>
+        /// 帳號大頭貼服務
+        /// </summary>
+        private readonly IAccountImageService AccountImageService;
+
+        /// <summary>
         /// Jwt服務
         /// </summary>
         private readonly IJwtService JwtService;
@@ -29,12 +35,15 @@ namespace BX.Web.Controllers
         /// 建構子
         /// </summary>
         /// <param name="accountService">帳號服務</param>
+        /// <param name="accountImageService">帳號大頭貼服務</param>
         /// <param name="jwtService">Jwt服務</param>
         public AccountController(
             IAccountService accountService,
+            IAccountImageService accountImageService,
             IJwtService jwtService)
         {
             this.AccountService = accountService;
+            this.AccountImageService = accountImageService;
             this.JwtService = jwtService;
         }
 
@@ -152,18 +161,32 @@ namespace BX.Web.Controllers
             return new ApiResponseViewModel<List<string>>();
         }
 
-        //[Authorize(Policy = "User")]
-        //[HttpPost("UpLoadImage")]
-        //public IActionResult UpLoadImage(UploadImage uploadImage)
-        //{
-        //    return this.Ok(this._AccountService.UpLoadImage(uploadImage.Account, uploadImage.Base64data));
-        //}
+        /// <summary>
+        /// 上傳帳號大頭貼
+        /// </summary>
+        /// <param name="uploadImage">圖檔資訊</param>
+        /// <returns>上傳結果</returns>
+        [HttpPost("UpLoadImage")]
+        public ApiResponseViewModel<List<string>> UpLoadImage(UploadImage uploadImage)
+        {
+            ApiResponseViewModel<List<string>> apiResult = this.AccountImageService
+                                                               .UpLoadImageAsync(uploadImage.Account, uploadImage.Base64data)
+                                                               .GetAwaiter().GetResult().CovertToApiResponse();
 
-        //[Authorize(Policy = "User")]
-        //[HttpPost("GetImage")]
-        //public IActionResult GetImage(UploadImage uploadImage)
-        //{
-        //    return this.Ok(this._AccountService.GetImage(uploadImage.Account));
-        //}
+            return apiResult;
+        }
+
+        /// <summary>
+        /// 取得帳號大頭貼
+        /// </summary>
+        /// <param name="accountData">帳號資訊</param>
+        /// <returns>圖檔資訊</returns>
+        [HttpPost("GetImage"), Authorize]
+        public ApiResponseViewModel<List<string>, string> GetImage(AccountViewModel accountData)
+        {
+            ApiResponseViewModel<List<string>, string> apiResult = this.AccountImageService.GetImage(accountData.AccountName).CovertToApiResponse();
+
+            return apiResult;
+        }
     }
 }

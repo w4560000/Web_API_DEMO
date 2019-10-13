@@ -19,6 +19,11 @@ namespace BX.Web.Security
         private string CurrentAccountName { get; set; }
 
         /// <summary>
+        /// 是否從Facebook登入
+        /// </summary>
+        private bool IsFacebookLogin { get; set; }
+
+        /// <summary>
         /// action完成後 自動刷新Jwt
         /// </summary>
         /// <param name="context">ActionExecutedContext</param>
@@ -31,6 +36,7 @@ namespace BX.Web.Security
                     if (response.IsSuccess)
                     {
                         response.JwtData.Account = this.CurrentAccountName;
+                        response.IsFacebookLogin = this.IsFacebookLogin;
                         response.JwtData.Jwt = context.HttpContext.RequestServices.GetService<IJwtService>().ResponseJWT(this.CurrentAccountName);
                     }
                 }
@@ -46,6 +52,7 @@ namespace BX.Web.Security
             if (context.ActionArguments.Values.FirstOrDefault() is AccountViewModel accountData)
             {
                 this.CurrentAccountName = accountData.AccountName;
+                this.IsFacebookLogin = accountData.IsFacebookLogin;
             }
         }
     }

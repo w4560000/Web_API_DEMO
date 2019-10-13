@@ -29,5 +29,10 @@
         /// 驗證信重寄的類型 Ex: 重設密碼 or 重寄驗證季
         /// </summary>
         public MailEnum ResendMailType { get; set; }
+
+        /// <summary>
+        /// 是否從Facebook登入
+        /// </summary>
+        public bool IsFacebookLogin { get; set; } = false;
     }
 }

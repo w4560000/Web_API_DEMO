@@ -22,5 +22,21 @@ namespace BX.Web
                 ResponseStatusCode = result.ResponseStatusCode
             };
         }
+
+        /// <summary>
+        /// 轉成ApiResponse
+        /// </summary>
+        /// <param name="result">ServerResult</param>
+        /// <returns>ApiResponse</returns>
+        public static ApiResponseViewModel<List<string>,T> CovertToApiResponse<T>(this Result<T> result)
+        {
+            return new ApiResponseViewModel<List<string>,T>()
+            {
+                IsSuccess = result.IsSuccess,
+                Result = result.Message,
+                ResponseStatusCode = result.ResponseStatusCode,
+                Data = result.Data
+            };
+        }
     }
 }

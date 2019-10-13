@@ -99,6 +99,34 @@ namespace BX.Service
         ValidateFail,
 
         /// <summary>
+        /// 上傳帳號大頭貼失敗 檔名錯誤
+        /// </summary>
+        [ResponseStatus("040")]
+        [Description("上傳失敗！請上傳JPF檔orPNG檔！")]
+        AccountImageTypeError,
+
+        /// <summary>
+        /// 上傳帳號大頭貼失敗 AzureStorage上傳失敗
+        /// </summary>
+        [ResponseStatus("041")]
+        [Description("上傳帳號大頭貼失敗！")]
+        UpLoadAccountImageFail,
+
+        /// <summary>
+        /// 上傳帳號大頭貼成功
+        /// </summary>
+        [ResponseStatus("042")]
+        [Description("上傳帳號大頭貼成功！")]
+        UpLoadAccountImageSuccess,
+
+        /// <summary>
+        /// 取得帳號大頭貼成功
+        /// </summary>
+        [ResponseStatus("043")]
+        [Description("取得帳號大頭貼成功！")]
+        GetAccountImageSuccess,
+
+        /// <summary>
         /// 資料庫新增失敗
         /// </summary>
         [ResponseStatus("100")]

@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.KeyVault;
+﻿using BX.Repository;
+using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using StackExchange.Redis;
 using System;
@@ -71,12 +72,7 @@ namespace BX.Service
         /// </summary>
         private static string GetBxRedisConnectionFromAzureKeyVault()
         {
-            KeyVaultClient keyVaultClient = new KeyVaultClient(
-                    new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
-
-            // yourKeyVaultName為金鑰儲存庫名稱
-            // yourSecretName為該金鑰儲存庫裡的Secret名稱
-            return keyVaultClient.GetSecretAsync("https://bingxiangKeyvault.vault.azure.net/", "bxRedisLabConnection").Result.Value;
+            return AzureKeyvaultHelper.GetAzureSecretVaule("bxRedisLabConnection");
         }
 
         /// <summary>

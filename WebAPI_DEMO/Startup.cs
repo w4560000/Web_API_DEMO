@@ -50,6 +50,7 @@ namespace WebAPI_DEMO
             services.AddScoped<IMailInfoService, MailInfoService>();
             services.AddTransient<IRedisService, RedisService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IAccountImageService, AccountImageService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
