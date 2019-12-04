@@ -2,44 +2,41 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-2019'
+  name: Hosted VS2017
 
 variables:
   solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-
+  BuildPlatform: 'Any CPU'
+  BuildConfiguration: 'Release'
+  
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .Net Core sdk 3.0.100-preview8-013656'
+- task: DotNetCoreCLI@2
+  displayName: Restore
   inputs:
-    version: '3.0.100-preview8-013656'
-    includePreviewVersions: true
+    command: restore
+    projects: '$(solution)'
 
-# - powershell: |
-#    $globaljson = '{"sdk": {"version": "3.0.100-preview8-013656"}}';
-#    $globaljson | out-file './test.app/global.json' -Encoding UTF8
-#   displayName: 'Global Json'
-
-- task: PowerShell@2
-  displayName: 'Global Json'
+- task: DotNetCoreCLI@2
+  displayName: Build
   inputs:
-    targetType: 'inline'
-    script: 'dotnet new globaljson --sdk-version 3.0.100-preview8-013656'
+    projects: '$(solution)'
+    arguments: '--configuration $(BuildConfiguration)'
 
-- task: NuGetToolInstaller@1
-  displayName: 'Use NuGet 5.x'
+- task: DotNetCoreCLI@2
+  displayName: Test
   inputs:
-    versionSpec: 5.x
-    checkLatest: true
+    command: test
+    projects: '$(Parameters.TestProjects)'
+    arguments: '--configuration $(BuildConfiguration)'
 
-- task: NuGetCommand@2
-  displayName: 'NuGet restore'
+- task: DotNetCoreCLI@2
+  displayName: Publish
   inputs:
-    restoreSolution: '$(solution)'
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output "$(build.artifactstagingdirectory)"'
 
-- task: VSBuild@1
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    PathtoPublish: '$(build.artifactstagingdirectory)'
