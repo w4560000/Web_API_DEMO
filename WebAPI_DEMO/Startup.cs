@@ -36,7 +36,7 @@ namespace WebAPI_DEMO
                 options.AddPolicy("CorsPolicy", policy =>
                 {
                     policy.WithOrigins("http://localhost:9595")
-                          .WithOrigins("https://bx-vue.azurewebsites.net/")
+                          .WithOrigins("https://bx-vue.azurewebsites.net")
                           .WithOrigins("https://27ac38b6.ngrok.io")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
