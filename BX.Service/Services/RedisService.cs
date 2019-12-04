@@ -14,7 +14,7 @@ namespace BX.Service
         /// </summary>
         ~RedisService()
         {
-            this.Dispose(false);
+            this.Dispose(true);
         }
 
         /// <summary>

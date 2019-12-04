@@ -158,7 +158,7 @@ namespace BX.Web.Controllers
         [HttpPost("ResponseJwt"), ReFreshJwtFilter]
         public ApiResponseViewModel<List<string>> ResponseJwt(AccountViewModel accountData)
         {
-            return new ApiResponseViewModel<List<string>>();
+            return new ApiResponseViewModel<List<string>>() { IsSuccess = true};
         }
 
         /// <summary>

@@ -21,7 +21,7 @@ namespace BX.Web.Security
         /// <summary>
         /// 是否從Facebook登入
         /// </summary>
-        private bool IsFacebookLogin { get; set; }
+        private bool IsFacebookLogin { get; set; } = false;
 
         /// <summary>
         /// action完成後 自動刷新Jwt

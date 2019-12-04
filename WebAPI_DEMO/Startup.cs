@@ -35,8 +35,9 @@ namespace WebAPI_DEMO
                 // CorsPolicy 是自訂的 Policy 名稱
                 options.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.WithOrigins("http://localhost:9999")
+                    policy.WithOrigins("http://localhost:9595")
                           .WithOrigins("https://bx-vue.azurewebsites.net/")
+                          .WithOrigins("https://27ac38b6.ngrok.io")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();

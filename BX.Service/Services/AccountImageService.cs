@@ -78,7 +78,7 @@ namespace BX.Service
             //base64轉換為byte
             bytes = Convert.FromBase64String(imageBase64String);
 
-            if (!type.Contains("jpeg") && !type.Contains("png"))
+            if (!type.Contains("jpeg") && !type.Contains("png") && !type.Contains("gif"))
             {
                 result.SetErrorMode().SetMessage(ResponseMessageEnum.AccountImageTypeError);
 
