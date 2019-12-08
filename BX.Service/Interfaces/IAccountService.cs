@@ -31,7 +31,7 @@ namespace BX.Service
         /// </summary>
         /// <param name="Account">帳號</param>
         /// <param name="Email">信箱</param>
-        /// <returns>結果</returns>
+        /// <returns>確認結果</returns>
         Result ReSendEmailForReSetPassWord(AccountViewModel accountViewModel);
 
         /// <summary>
@@ -39,18 +39,21 @@ namespace BX.Service
         /// </summary>
         /// <param name="Account">帳號</param>
         /// <param name="PassWord">密碼</param>
+        /// <returns>重置結果</returns>
         Result ResetPassWord(string accountName, string passWord);
 
         /// <summary>
         /// 登出
         /// </summary>
         /// <param name="Account">帳號</param>
+        /// <returns>登出結果</returns>
         public Result SignOut(string account);
 
-        ////上傳大頭照
-        //string UpLoadImage(string Account, string base64data);
-
-        ////回傳大頭照至前端
-        //string GetImage(string Account);
+        /// <summary>
+        /// 使用者 超過30分鐘沒有動作 則強制登出
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <returns>回傳結果</returns>
+        Result CheckUserLoginTimeout(string account);
     }
 }

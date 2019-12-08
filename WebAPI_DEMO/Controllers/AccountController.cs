@@ -188,5 +188,18 @@ namespace BX.Web.Controllers
 
             return apiResult;
         }
+
+        /// <summary>
+        /// 使用者 超過30分鐘沒有動作 則強制登出
+        /// </summary>
+        /// <param name="accountData">帳號資料</param>
+        /// <returns>回傳結果</returns>
+        [HttpPost("CheckUserLoginTimeout"), Authorize]
+        public ApiResponseViewModel<List<string>> CheckUserLoginTimeout(AccountViewModel accountData)
+        {
+            ApiResponseViewModel<List<string>> apiResult = this.AccountService.CheckUserLoginTimeout(accountData.AccountName).CovertToApiResponse();
+
+            return apiResult;
+        }
     }
 }

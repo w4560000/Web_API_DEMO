@@ -137,7 +137,7 @@ namespace BX.Service
         /// </summary>
         /// <param name="Account">帳號</param>
         /// <param name="Email">信箱</param>
-        /// <returns></returns>
+        /// <returns>確認結果</returns>
         public Result ReSendEmailForReSetPassWord(AccountViewModel accountViewModel)
         {
             Account Item = this.GetAccountData(accountViewModel.AccountName);
@@ -181,6 +181,7 @@ namespace BX.Service
         /// </summary>
         /// <param name="Account">帳號</param>
         /// <param name="PassWord">密碼</param>
+        /// <returns>重置結果</returns>
         public Result ResetPassWord(string accountName, string passWord)
         {
             Account item = this.GetAccountData(accountName);
@@ -203,6 +204,7 @@ namespace BX.Service
         /// 登出
         /// </summary>
         /// <param name="Account">帳號</param>
+        /// <returns>登出結果</returns>
         public Result SignOut(string account)
         {
             this.RedisService.DeleteAccountLoginDate(account);
@@ -212,10 +214,30 @@ namespace BX.Service
         }
 
         /// <summary>
+        /// 使用者 超過30分鐘沒有動作 則強制登出
+        /// </summary>
+        /// <param name="account">帳號</param>
+        /// <returns>回傳結果</returns>
+        public Result CheckUserLoginTimeout(string account)
+        {
+            DateTime userLoginDate = this.RedisService.GetAccountLoginDate(account);
+
+            if (!userLoginDate.Equals(new DateTime()))
+            {
+                if (DateTime.Compare(userLoginDate.AddMinutes(30), DateTime.Now) == -1)
+                {
+                    this.Result.SetMessage(ResponseMessageEnum.LoginTimeout.GetEnumDescription());
+                }
+            }
+
+            return this.Result;
+        }
+
+        /// <summary>
         /// 檢查帳號可否使用
         /// </summary>
-        /// <param name="accountName"></param>
-        /// <returns></returns>
+        /// <param name="account">帳號</param>
+        /// <returns>檢查結果</returns>
         private (bool, List<string>) CheckAccountCanUse(AccountViewModel account)
         {
             List<string> errorMessage = new List<string>();
@@ -244,7 +266,7 @@ namespace BX.Service
         /// <summary>
         /// 註冊帳號
         /// </summary>
-        /// <param name="AccountData"></param>
+        /// <param name="account">帳號</param>
         private void SignupAccount(AccountViewModel account)
         {
             this.SendMail(account, MailEnum.AccountSignupVerificationCode);
@@ -271,7 +293,7 @@ namespace BX.Service
         /// 取得帳號資料
         /// </summary>
         /// <param name="accountName">帳號名稱</param>
-        /// <returns></returns>
+        /// <returns>帳號資料</returns>
         private Account GetAccountData(string accountName)
         {
             return this.AccountRepository

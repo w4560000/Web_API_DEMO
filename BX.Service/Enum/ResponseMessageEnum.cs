@@ -49,6 +49,10 @@ namespace BX.Service
         [Description("請輸入驗證碼後重設密碼。")]
         ReSetPassWordVerificationCode,
 
+        [ResponseStatus("007")]
+        [Description("您長時間無動作，系統自動登出。")]
+        LoginTimeout,
+
         /// <summary>
         /// 帳號登入失敗
         /// </summary>

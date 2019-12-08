@@ -99,7 +99,7 @@ namespace BX.Service
                         if (this.Redis == null || !this.Redis.IsConnected)
                         {
                             string connectionString = GetBxRedisConnectionFromAzureKeyVault();
-                            this.Redis = ConnectionMultiplexer.Connect(connectionString);
+                            this.Redis = ConnectionMultiplexer.Connect(connectionString + ",abortConnect=false");
                         }
                     }
                 }
