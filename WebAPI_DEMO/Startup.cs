@@ -37,7 +37,6 @@ namespace WebAPI_DEMO
                 {
                     policy.WithOrigins("http://localhost:9595")
                           .WithOrigins("https://bx-vue.azurewebsites.net")
-                          .WithOrigins("https://27ac38b6.ngrok.io")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -91,10 +90,10 @@ namespace WebAPI_DEMO
                 options.Filters.Add(new AuthorizationFilter());
             });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("User", policy => policy.AddRequirements(new Auth_Middle()));
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("User", policy => policy.AddRequirements(new Auth_Middle()));
+            //});
 
             services.Configure<IISServerOptions>(options =>
             {
