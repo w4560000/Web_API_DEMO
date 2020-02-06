@@ -1,20 +1,18 @@
 ﻿using BX.Repository;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
 
 namespace BX.Service
 {
-    public class RedisService : IRedisService
+    public class RedisService : IRedisService, IDisposable
     {
         /// <summary>
         /// Destructor
         /// </summary>
         ~RedisService()
         {
-            this.Dispose(true);
+            this.Dispose(false);
         }
 
         /// <summary>
@@ -52,6 +50,7 @@ namespace BX.Service
         }
 
         #region Redis連線
+
         /// <summary>
         /// Represents an inter-related group of connections to redis servers
         /// </summary>
@@ -109,12 +108,24 @@ namespace BX.Service
         }
 
         /// <summary>
+        /// Release all resources associated with this object
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            // This object will be cleaned up by the Dispose method. Therefore, you should call
+            // GC.SupressFinalize to take this object off the finalization queue and prevent
+            // finalization code for this object from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
         /// Dispose
         /// </summary>
         /// <param name="disposing">
         /// If disposing equals true, dispose all managed and unmanaged resources.
         /// </param>
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.
             if (this.Disposed)
@@ -132,9 +143,11 @@ namespace BX.Service
             // Note disposing has been done.
             this.Disposed = true;
         }
-        #endregion
+
+        #endregion Redis連線
 
         #region Redis操作
+
         /// <summary>
         /// 取得快取內容
         /// </summary>
@@ -186,6 +199,7 @@ namespace BX.Service
         /// 移除快取內容
         /// </summary>
         public void Remove(string key) => this.RedisDb().KeyDelete(key);
-        #endregion
+
+        #endregion Redis操作
     }
 }

@@ -224,7 +224,7 @@ namespace BX.Service
 
             if (!userLoginDate.Equals(new DateTime()))
             {
-                if (DateTime.Compare(userLoginDate.AddMinutes(-30), DateTime.Now) == -1)
+                if (DateTime.Compare(userLoginDate.AddMinutes(30), DateTime.Now) == -1)
                 {
                     this.Result.SetMessage(ResponseMessageEnum.LoginTimeout.GetEnumDescription());
                 }
