@@ -1,4 +1,5 @@
-﻿using BX.Service.Model;
+﻿using BX.Repository;
+using BX.Service.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
@@ -25,7 +26,7 @@ namespace BX.Service
         {
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
             smtpClient.EnableSsl = true;
-            smtpClient.Credentials = new System.Net.NetworkCredential("testbingxiang@gmail.com", "a33456789");
+            smtpClient.Credentials = new System.Net.NetworkCredential("testbingxiang@gmail.com", AzureKeyvaultHelper.GetAzureSecretVaule("bxWebApiMailPassword"));
             smtpClient.SendAsync(this.SetEmailByRazorInfo(emailTemplateDto, sendEmailDto, model), null);
         }
 
