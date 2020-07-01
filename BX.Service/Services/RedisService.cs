@@ -22,7 +22,7 @@ namespace BX.Service
         /// <returns>帳號登入時間</returns>
         public DateTime GetAccountLoginDate(string Account)
         {
-            DateTime accountLoginDate = new DateTime();
+            DateTime accountLoginDate = DateTime.Now;
             if (this.IsSet(Account + "_LoginAccountDate"))
             {
                 accountLoginDate = this.Get<DateTime>(Account + "_LoginAccountDate");
