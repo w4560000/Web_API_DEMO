@@ -100,12 +100,12 @@ namespace BX.Service
 
                 CloudBlockBlob cloudBlockBlob = this.GetAzureCloudBlobDirectory().GetBlockBlobReference(localFileName);
 
-                await cloudBlockBlob.DeleteAsync();
+                await cloudBlockBlob.DeleteIfExistsAsync();
                 await cloudBlockBlob.UploadFromByteArrayAsync(bytes, 0, bytes.Length);
 
                 result.SetMessage(ResponseMessageEnum.UpLoadAccountImageSuccess);
             }
-            catch
+            catch (Exception ex)
             {
                 result.SetErrorMode().SetMessage(ResponseMessageEnum.UpLoadAccountImageFail);
             }
